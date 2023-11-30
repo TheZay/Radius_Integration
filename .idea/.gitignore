@@ -1,0 +1,13 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# Non-default ignored fiels
+/old_data/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.vscode/
+*.log\
+*.xml

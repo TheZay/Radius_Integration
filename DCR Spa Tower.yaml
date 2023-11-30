@@ -1,0 +1,21 @@
+common_vars:
+  device_type: cisco_ios
+
+hosts:
+  - hostname: DCR-SPA3-Access
+    host: 10.201.16.76
+
+  - hostname: DCR-SPA6-Access
+    host: 10.201.16.135
+
+  - hostname: DCR-SPA8-Access
+    host: 10.201.16.191
+
+  - hostname: DCR-SPA10-Access
+    host: 10.201.16.253
+
+  - hostname: DCR-SPA12-Access
+    host: 10.201.17.87
+
+  - hostname: DCR-SPA14-Access
+    host: 10.201.16.252
