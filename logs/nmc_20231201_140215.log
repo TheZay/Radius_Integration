@@ -1,0 +1,687 @@
+[14:02:15][INFO][2160][main:449] Script execution started: 2023-12-01 14:02:15
+[14:02:25][INFO][2160][connect_to_device:337] ===> Connecting to DCR-SPA3-Access (10.201.16.76)
+[14:02:25][INFO][2160][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[14:02:26][INFO][2160][_log:1893] Auth banner: b'CCCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[14:02:26][INFO][2160][_log:1893] Authentication (password) successful!
+[14:02:26][INFO][2160][connect_to_device:340] <=== Received DCR-SPA3-Access (10.201.16.76)
+[14:02:26][INFO][2160][process_device_data:379] Processing data on the network device ...
+[14:02:26][INFO][2160][send_command:421] Executing command: "show vlan brief"
+[14:02:27][INFO][2160][extract_voip_vlans:150]   VoIP VLANs found: [387, 388]
+[14:02:27][INFO][2160][extract_ap_vlans:164]   AP VLANs found: [210]
+[14:02:27][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 387"
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 00eb.d5cd.7c74 on GigabitEthernet1/34
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8c5c on GigabitEthernet1/2
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7ac8 on GigabitEthernet1/6
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7ca0 on GigabitEthernet1/48
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7d3d on GigabitEthernet1/4
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7df2 on GigabitEthernet1/46
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e90 on GigabitEthernet1/14
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7ef2 on GigabitEthernet1/19
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7efa on GigabitEthernet1/16
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f45 on GigabitEthernet1/7
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f52 on GigabitEthernet1/18
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f88 on GigabitEthernet1/21
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f9a on GigabitEthernet1/10
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7fcd on GigabitEthernet1/38
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7fee on GigabitEthernet1/24
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7fff on GigabitEthernet1/28
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8000 on GigabitEthernet1/26
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.800b on GigabitEthernet1/40
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.800e on GigabitEthernet1/41
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.801c on GigabitEthernet1/44
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.81af on GigabitEthernet1/30
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82f0 on GigabitEthernet1/32
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.830f on GigabitEthernet1/36
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8311 on GigabitEthernet2/6
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.831a on GigabitEthernet2/4
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.833d on GigabitEthernet2/8
+[14:02:27][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 388"
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 445c.e953.4b06 on GigabitEthernet6/16
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7c84 on GigabitEthernet5/12
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7dd4 on GigabitEthernet2/40
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e62 on GigabitEthernet2/42
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e8f on GigabitEthernet5/39
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f46 on GigabitEthernet2/43
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f60 on GigabitEthernet5/38
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f6f on GigabitEthernet2/47
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f76 on GigabitEthernet2/13
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f89 on GigabitEthernet2/16
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7fd3 on GigabitEthernet2/22
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7fd5 on GigabitEthernet2/18
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.802a on GigabitEthernet2/24
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.803a on GigabitEthernet2/20
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.80f4 on GigabitEthernet2/25
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82d2 on GigabitEthernet2/29
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8312 on GigabitEthernet2/30
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8318 on GigabitEthernet5/2
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8324 on GigabitEthernet2/33
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8327 on GigabitEthernet2/28
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8341 on GigabitEthernet2/12
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8344 on GigabitEthernet5/4
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.834c on GigabitEthernet2/36
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8353 on GigabitEthernet5/6
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.835d on GigabitEthernet2/37
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.836c on GigabitEthernet5/8
+[14:02:27][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.83eb on GigabitEthernet2/9
+[14:02:27][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 210"
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 004e.35c6.e570 on GigabitEthernet5/42
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 004e.35c6.e5ae on GigabitEthernet5/41
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 004e.35c6.eb50 on GigabitEthernet5/45
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 004e.35c6.ed22 on GigabitEthernet5/46
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.04a0 on GigabitEthernet2/6
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.04a5 on GigabitEthernet5/39
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0789 on GigabitEthernet1/44
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.07c0 on GigabitEthernet1/10
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.087e on GigabitEthernet1/18
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.08ce on GigabitEthernet1/40
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.09d7 on GigabitEthernet1/28
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0a90 on GigabitEthernet2/36
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0b3f on GigabitEthernet1/21
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0c89 on GigabitEthernet1/2
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0d4c on GigabitEthernet1/16
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0d56 on GigabitEthernet1/38
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0e05 on GigabitEthernet2/4
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0e46 on GigabitEthernet2/16
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0f09 on GigabitEthernet1/20
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.10b2 on GigabitEthernet2/24
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.10f8 on GigabitEthernet2/20
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1418 on GigabitEthernet1/32
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.145e on GigabitEthernet1/34
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.146d on GigabitEthernet2/8
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1486 on GigabitEthernet1/41
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.14a4 on GigabitEthernet2/14
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.14c2 on GigabitEthernet2/18
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.154e on GigabitEthernet5/8
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1602 on GigabitEthernet5/4
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1620 on GigabitEthernet1/26
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.16cf on GigabitEthernet1/14
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.175b on GigabitEthernet1/4
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.18dc on GigabitEthernet1/48
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1b1b on GigabitEthernet2/33
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1b39 on GigabitEthernet2/22
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1c88 on GigabitEthernet1/7
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2075 on GigabitEthernet2/47
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.21fb on GigabitEthernet2/28
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.224b on GigabitEthernet5/6
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.22dc on GigabitEthernet1/30
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2372 on GigabitEthernet1/36
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.23db on GigabitEthernet2/29
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2647 on GigabitEthernet2/12
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2692 on GigabitEthernet2/40
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.26c9 on GigabitEthernet2/37
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.26d3 on GigabitEthernet2/43
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2778 on GigabitEthernet1/6
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.27af on GigabitEthernet5/2
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.27c8 on GigabitEthernet2/25
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2a16 on GigabitEthernet1/46
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2c1e on GigabitEthernet2/9
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2cdc on GigabitEthernet2/42
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2d40 on GigabitEthernet2/30
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2f43 on GigabitEthernet5/12
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.3100 on GigabitEthernet5/38
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.315f on GigabitEthernet1/24
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.566a on GigabitEthernet5/44
+[14:02:28][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.58f0 on GigabitEthernet5/47
+[14:02:28][INFO][2160][process_device_data:390] ... Finished processing data on the network device.
+[14:02:28][INFO][2160][disconnect_from_device:439] Disconnected from DCR-SPA3-Access (10.201.16.76)
+[14:02:28][INFO][2160][connect_to_device:337] ===> Connecting to DCR-SPA6-Access (10.201.16.135)
+[14:02:28][INFO][2160][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[14:02:28][INFO][2160][_log:1893] Auth banner: b'CCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[14:02:28][INFO][2160][_log:1893] Authentication (password) successful!
+[14:02:29][INFO][2160][connect_to_device:340] <=== Received DCR-SPA6-Access (10.201.16.135)
+[14:02:29][INFO][2160][process_device_data:379] Processing data on the network device ...
+[14:02:29][INFO][2160][send_command:421] Executing command: "show vlan brief"
+[14:02:29][INFO][2160][extract_voip_vlans:150]   VoIP VLANs found: [389, 390]
+[14:02:29][INFO][2160][extract_ap_vlans:164]   AP VLANs found: [210]
+[14:02:29][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 389"
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.62ad on GigabitEthernet1/30
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.63aa on GigabitEthernet1/33
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7cb2 on GigabitEthernet1/32
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f2f on GigabitEthernet1/36
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f77 on GigabitEthernet1/26
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f83 on GigabitEthernet2/6
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f85 on GigabitEthernet2/3
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f8e on GigabitEthernet1/28
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f9c on GigabitEthernet2/8
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7fd8 on GigabitEthernet1/4
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7ff0 on GigabitEthernet1/6
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.801a on GigabitEthernet1/1
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.801e on GigabitEthernet1/7
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.802d on GigabitEthernet1/10
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8032 on GigabitEthernet1/38
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8233 on GigabitEthernet1/41
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82cf on GigabitEthernet1/44
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82d4 on GigabitEthernet1/48
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82dd on GigabitEthernet1/46
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82ec on GigabitEthernet1/14
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82f9 on GigabitEthernet1/20
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82fb on GigabitEthernet1/18
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.830a on GigabitEthernet1/22
+[14:02:29][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.830c on GigabitEthernet1/24
+[14:02:29][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 390"
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7de5 on GigabitEthernet2/38
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e4c on GigabitEthernet2/10
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e5c on GigabitEthernet2/39
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e5e on GigabitEthernet2/48
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e60 on GigabitEthernet2/42
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e72 on GigabitEthernet2/15
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f1c on GigabitEthernet2/44
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7fe9 on GigabitEthernet2/12
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8073 on GigabitEthernet2/32
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.80f8 on GigabitEthernet2/22
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8168 on GigabitEthernet2/18
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.818b on GigabitEthernet2/24
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.819a on GigabitEthernet2/14
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.81a7 on GigabitEthernet2/20
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.81a9 on GigabitEthernet2/28
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.81dd on GigabitEthernet2/26
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.81fa on GigabitEthernet2/30
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82ca on GigabitEthernet5/2
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82f2 on GigabitEthernet5/6
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82fa on GigabitEthernet2/34
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.830e on GigabitEthernet5/4
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8316 on GigabitEthernet2/36
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8321 on GigabitEthernet5/12
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8325 on GigabitEthernet5/39
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.832e on GigabitEthernet5/38
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8347 on GigabitEthernet5/8
+[14:02:30][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 210"
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0496 on GigabitEthernet1/18
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0540 on GigabitEthernet2/48
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.055e on GigabitEthernet2/10
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.05a4 on GigabitEthernet5/38
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.06bc on GigabitEthernet1/6
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.06c1 on GigabitEthernet2/6
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0897 on GigabitEthernet1/36
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.09a0 on GigabitEthernet5/12
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0a40 on GigabitEthernet1/41
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0b67 on GigabitEthernet5/8
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0c34 on GigabitEthernet2/26
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0dc4 on GigabitEthernet2/44
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0e1e on GigabitEthernet1/20
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0e69 on GigabitEthernet2/36
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0fef on GigabitEthernet1/22
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1148 on GigabitEthernet1/30
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1305 on GigabitEthernet2/28
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.131e on GigabitEthernet2/3
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.150d on GigabitEthernet1/38
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.15c6 on GigabitEthernet1/14
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1a12 on GigabitEthernet1/44
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1a8a on GigabitEthernet1/48
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1b3e on GigabitEthernet1/28
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1bb1 on GigabitEthernet2/22
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1c1a on GigabitEthernet1/24
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1c1f on GigabitEthernet1/32
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1cc4 on GigabitEthernet5/4
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1daf on GigabitEthernet5/2
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1e18 on GigabitEthernet2/8
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1e9f on GigabitEthernet2/39
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1f21 on GigabitEthernet2/18
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1f67 on GigabitEthernet1/26
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1f71 on GigabitEthernet5/39
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1f85 on GigabitEthernet2/20
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2098 on GigabitEthernet2/32
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.229b on GigabitEthernet2/38
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.22a0 on GigabitEthernet1/4
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.250c on GigabitEthernet2/14
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.257a on GigabitEthernet5/6
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.26a6 on GigabitEthernet1/7
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.26ec on GigabitEthernet1/10
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.26f1 on GigabitEthernet2/12
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2999 on GigabitEthernet2/24
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2a43 on GigabitEthernet2/34
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2a98 on GigabitEthernet1/33
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2bc9 on GigabitEthernet2/42
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2dea on GigabitEthernet1/1
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2eee on GigabitEthernet1/46
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2f25 on GigabitEthernet2/30
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.30f6 on GigabitEthernet2/15
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.56cc on GigabitEthernet5/42
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.58e0 on GigabitEthernet5/41
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.59e4 on GigabitEthernet5/46
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5a4e on GigabitEthernet5/47
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5a88 on GigabitEthernet5/44
+[14:02:30][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5b82 on GigabitEthernet5/45
+[14:02:30][INFO][2160][process_device_data:390] ... Finished processing data on the network device.
+[14:02:30][INFO][2160][disconnect_from_device:439] Disconnected from DCR-SPA6-Access (10.201.16.135)
+[14:02:30][INFO][2160][connect_to_device:337] ===> Connecting to DCR-SPA8-Access (10.201.16.191)
+[14:02:30][INFO][2160][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[14:02:30][INFO][2160][_log:1893] Auth banner: b'CCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[14:02:30][INFO][2160][_log:1893] Authentication (password) successful!
+[14:02:31][INFO][2160][connect_to_device:340] <=== Received DCR-SPA8-Access (10.201.16.191)
+[14:02:31][INFO][2160][process_device_data:379] Processing data on the network device ...
+[14:02:31][INFO][2160][send_command:421] Executing command: "show vlan brief"
+[14:02:31][INFO][2160][extract_voip_vlans:150]   VoIP VLANs found: [391, 392]
+[14:02:31][INFO][2160][extract_ap_vlans:164]   AP VLANs found: [210]
+[14:02:31][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 391"
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b81 on GigabitEthernet1/18
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7c2e on GigabitEthernet1/32
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7d23 on GigabitEthernet1/34
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e82 on GigabitEthernet2/3
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f23 on GigabitEthernet2/7
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f65 on GigabitEthernet1/36
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f8c on GigabitEthernet2/6
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.806a on GigabitEthernet1/46
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8234 on GigabitEthernet1/6
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82ab on GigabitEthernet1/2
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82be on GigabitEthernet1/8
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82cc on GigabitEthernet1/38
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82ce on GigabitEthernet1/14
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82d7 on GigabitEthernet1/16
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82d8 on GigabitEthernet1/20
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82df on GigabitEthernet1/10
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82e5 on GigabitEthernet1/40
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82ea on GigabitEthernet1/22
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.82fd on GigabitEthernet1/41
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8300 on GigabitEthernet1/44
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8304 on GigabitEthernet1/24
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8306 on GigabitEthernet1/28
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.830b on GigabitEthernet1/26
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.831c on GigabitEthernet1/47
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.83b5 on GigabitEthernet1/30
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered b811.4bab.e758 on GigabitEthernet1/4
+[14:02:32][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 392"
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.2ed6 on GigabitEthernet2/36
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8ba0 on GigabitEthernet2/30
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7ab6 on GigabitEthernet2/31
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e26 on GigabitEthernet2/28
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7ef8 on GigabitEthernet5/2
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f20 on GigabitEthernet5/40
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f2c on GigabitEthernet5/39
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f5f on GigabitEthernet2/34
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f72 on GigabitEthernet5/4
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f7b on GigabitEthernet5/7
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f8d on GigabitEthernet5/12
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8005 on GigabitEthernet5/6
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8016 on GigabitEthernet2/10
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8024 on GigabitEthernet2/39
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8031 on GigabitEthernet2/12
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.803f on GigabitEthernet2/38
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8059 on GigabitEthernet2/42
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8333 on GigabitEthernet2/44
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.833f on GigabitEthernet2/22
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.836f on GigabitEthernet2/48
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8374 on GigabitEthernet2/15
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.839c on GigabitEthernet2/14
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.839e on GigabitEthernet2/20
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.83a5 on GigabitEthernet2/26
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.83ab on GigabitEthernet2/17
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.83cd on GigabitEthernet2/24
+[14:02:32][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 210"
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.02e8 on GigabitEthernet1/24
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.02f7 on GigabitEthernet1/2
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.07f7 on GigabitEthernet2/6
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.08d3 on GigabitEthernet2/20
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.09af on GigabitEthernet1/10
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0af4 on GigabitEthernet1/18
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0b12 on GigabitEthernet1/34
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0c2a on GigabitEthernet2/3
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0d24 on GigabitEthernet2/36
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0dc9 on GigabitEthernet5/39
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0e3c on GigabitEthernet1/22
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0e8c on GigabitEthernet1/41
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0f22 on GigabitEthernet5/7
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.10ad on GigabitEthernet1/4
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.137d on GigabitEthernet2/39
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.13c8 on GigabitEthernet1/36
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.144f on GigabitEthernet5/4
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1521 on GigabitEthernet1/30
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.156c on GigabitEthernet1/48
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1576 on GigabitEthernet1/28
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1594 on GigabitEthernet1/32
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.15cb on GigabitEthernet2/28
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.173d on GigabitEthernet1/8
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.17f1 on GigabitEthernet1/44
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.17f6 on GigabitEthernet1/40
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1d78 on GigabitEthernet1/6
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1e5e on GigabitEthernet1/46
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1f08 on GigabitEthernet5/40
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.20ac on GigabitEthernet5/6
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.211a on GigabitEthernet2/18
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.248f on GigabitEthernet1/38
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2575 on GigabitEthernet5/12
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.25cf on GigabitEthernet2/30
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.26a1 on GigabitEthernet2/26
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.276e on GigabitEthernet1/26
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.27b4 on GigabitEthernet2/48
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.29b7 on GigabitEthernet2/42
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2a5c on GigabitEthernet2/8
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2a84 on GigabitEthernet2/14
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2c00 on GigabitEthernet1/20
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2cb9 on GigabitEthernet2/34
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2ddb on GigabitEthernet1/16
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2e3a on GigabitEthernet2/44
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.31d7 on GigabitEthernet2/32
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.3eb1 on GigabitEthernet2/38
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.451e on GigabitEthernet1/14
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.45a5 on GigabitEthernet2/15
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.480c on GigabitEthernet2/12
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.493d on GigabitEthernet2/22
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.496f on GigabitEthernet2/24
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.499c on GigabitEthernet2/10
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.4f4b on GigabitEthernet5/2
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5524 on GigabitEthernet5/47
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.553c on GigabitEthernet5/46
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.590c on GigabitEthernet5/45
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5aa2 on GigabitEthernet5/48
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5acc on GigabitEthernet5/42
+[14:02:32][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5c58 on GigabitEthernet5/43
+[14:02:32][INFO][2160][process_device_data:390] ... Finished processing data on the network device.
+[14:02:32][INFO][2160][disconnect_from_device:439] Disconnected from DCR-SPA8-Access (10.201.16.191)
+[14:02:32][INFO][2160][connect_to_device:337] ===> Connecting to DCR-SPA10-Access (10.201.16.253)
+[14:02:32][INFO][2160][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[14:02:33][INFO][2160][_log:1893] Auth banner: b'CCCCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[14:02:33][INFO][2160][_log:1893] Authentication (password) successful!
+[14:02:33][INFO][2160][connect_to_device:340] <=== Received DCR-SPA10-Access (10.201.16.253)
+[14:02:33][INFO][2160][process_device_data:379] Processing data on the network device ...
+[14:02:33][INFO][2160][send_command:421] Executing command: "show vlan brief"
+[14:02:34][INFO][2160][extract_voip_vlans:150]   VoIP VLANs found: [393, 394]
+[14:02:34][INFO][2160][extract_ap_vlans:164]   AP VLANs found: [210]
+[14:02:34][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 393"
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.345f on GigabitEthernet1/41
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b6a on GigabitEthernet1/30
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b7c on GigabitEthernet1/32
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b8e on GigabitEthernet1/34
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8ba3 on GigabitEthernet1/36
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8bad on GigabitEthernet2/6
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8baf on GigabitEthernet2/3
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8bb0 on GigabitEthernet2/8
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.616c on GigabitEthernet1/26
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7c8f on GigabitEthernet1/8
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7d90 on GigabitEthernet1/10
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7dff on GigabitEthernet1/44
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e17 on GigabitEthernet1/48
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e67 on GigabitEthernet1/38
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7e91 on GigabitEthernet1/40
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f03 on GigabitEthernet1/46
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f39 on GigabitEthernet1/14
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f53 on GigabitEthernet1/15
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f6a on GigabitEthernet1/20
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f7e on GigabitEthernet1/18
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f94 on GigabitEthernet1/22
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7fa1 on GigabitEthernet1/23
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7fe7 on GigabitEthernet1/28
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7ffa on GigabitEthernet1/4
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.800f on GigabitEthernet1/6
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.803d on GigabitEthernet1/2
+[14:02:34][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 394"
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4179 on GigabitEthernet2/26
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.417d on GigabitEthernet2/30
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4185 on GigabitEthernet2/28
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.418a on GigabitEthernet2/32
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.418c on GigabitEthernet5/2
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.419b on GigabitEthernet5/4
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.419d on GigabitEthernet2/36
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.41a8 on GigabitEthernet5/6
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.41f1 on GigabitEthernet5/8
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4496 on GigabitEthernet2/40
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.44b1 on GigabitEthernet5/12
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.44b3 on GigabitEthernet5/40
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.44bd on GigabitEthernet5/39
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.44d1 on GigabitEthernet2/42
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.44fd on GigabitEthernet2/43
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.451a on GigabitEthernet2/48
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.45fb on GigabitEthernet2/15
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4600 on GigabitEthernet2/14
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4607 on GigabitEthernet2/22
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4608 on GigabitEthernet2/18
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.460f on GigabitEthernet2/24
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4615 on GigabitEthernet2/20
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8bcd on GigabitEthernet2/12
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8bf1 on GigabitEthernet2/37
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8bfa on GigabitEthernet2/10
+[14:02:34][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 210"
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.040f on GigabitEthernet5/8
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0450 on GigabitEthernet1/20
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0b03 on GigabitEthernet5/39
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0b1c on GigabitEthernet5/2
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0c0c on GigabitEthernet2/26
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0ca2 on GigabitEthernet2/30
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0cb1 on GigabitEthernet5/40
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.10e9 on GigabitEthernet1/34
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1120 on GigabitEthernet2/42
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1157 on GigabitEthernet1/30
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1175 on GigabitEthernet5/4
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1323 on GigabitEthernet2/18
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.17b5 on GigabitEthernet1/22
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1873 on GigabitEthernet1/36
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1a30 on GigabitEthernet5/12
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1c15 on GigabitEthernet1/14
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1ca1 on GigabitEthernet2/8
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1df0 on GigabitEthernet2/6
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1ea4 on GigabitEthernet2/20
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1f2b on GigabitEthernet2/40
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2043 on GigabitEthernet2/32
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.22fa on GigabitEthernet2/3
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.23c7 on GigabitEthernet2/10
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.242b on GigabitEthernet2/24
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.24c6 on GigabitEthernet1/28
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2697 on GigabitEthernet2/36
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.26b5 on GigabitEthernet5/6
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.26ce on GigabitEthernet2/14
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2e1c on GigabitEthernet2/28
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.326d on GigabitEthernet1/10
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.3466 on GigabitEthernet1/38
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.3493 on GigabitEthernet1/4
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.34e3 on GigabitEthernet1/18
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.356f on GigabitEthernet2/22
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.3727 on GigabitEthernet2/48
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.3a1a on GigabitEthernet1/15
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.3d58 on GigabitEthernet1/46
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.3dad on GigabitEthernet1/6
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.3f38 on GigabitEthernet1/8
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.3fc4 on GigabitEthernet2/38
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.4294 on GigabitEthernet1/2
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.43fc on GigabitEthernet1/32
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.4609 on GigabitEthernet1/23
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.470d on GigabitEthernet1/48
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.49fb on GigabitEthernet1/26
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.4a19 on GigabitEthernet2/15
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.4c3f on GigabitEthernet2/43
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.4c58 on GigabitEthernet1/40
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.4d20 on GigabitEthernet1/44
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.4d25 on GigabitEthernet2/12
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.4e7e on GigabitEthernet1/41
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5554 on GigabitEthernet5/42
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.55c4 on GigabitEthernet5/45
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.56f4 on GigabitEthernet5/48
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.57aa on GigabitEthernet5/47
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5aae on GigabitEthernet5/43
+[14:02:34][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5bf6 on GigabitEthernet5/46
+[14:02:34][INFO][2160][process_device_data:390] ... Finished processing data on the network device.
+[14:02:34][INFO][2160][disconnect_from_device:439] Disconnected from DCR-SPA10-Access (10.201.16.253)
+[14:02:34][INFO][2160][connect_to_device:337] ===> Connecting to DCR-SPA12-Access (10.201.17.87)
+[14:02:35][INFO][2160][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[14:02:35][INFO][2160][_log:1893] Auth banner: b'CCCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[14:02:35][INFO][2160][_log:1893] Authentication (password) successful!
+[14:02:36][INFO][2160][connect_to_device:340] <=== Received DCR-SPA12-Access (10.201.17.87)
+[14:02:36][INFO][2160][process_device_data:379] Processing data on the network device ...
+[14:02:36][INFO][2160][send_command:421] Executing command: "show vlan brief"
+[14:02:36][INFO][2160][extract_voip_vlans:150]   VoIP VLANs found: [395, 396]
+[14:02:36][INFO][2160][extract_ap_vlans:164]   AP VLANs found: [210]
+[14:02:36][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 395"
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.44be on GigabitEthernet1/4
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.44c6 on GigabitEthernet1/1
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.44fc on GigabitEthernet1/7
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.45ec on GigabitEthernet1/10
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.471a on GigabitEthernet1/38
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.47ee on GigabitEthernet1/39
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.48a5 on GigabitEthernet1/19
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.48d4 on GigabitEthernet1/18
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4931 on GigabitEthernet1/22
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.493b on GigabitEthernet1/24
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4970 on GigabitEthernet1/41
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4a42 on GigabitEthernet1/43
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4b9f on GigabitEthernet1/48
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4c8a on GigabitEthernet1/46
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4d98 on GigabitEthernet1/14
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b51 on GigabitEthernet2/6
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b53 on GigabitEthernet2/3
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b78 on GigabitEthernet2/8
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b92 on GigabitEthernet1/30
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b94 on GigabitEthernet1/26
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b9b on GigabitEthernet1/32
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8ba7 on GigabitEthernet1/28
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8bce on GigabitEthernet1/34
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.6310 on GigabitEthernet1/36
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.7f84 on GigabitEthernet1/6
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered b811.4bab.ffa7 on GigabitEthernet1/16
+[14:02:36][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 396"
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.2d17 on GigabitEthernet5/6
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.2d45 on GigabitEthernet5/8
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.2d68 on GigabitEthernet5/11
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.2d89 on GigabitEthernet5/41
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.2e86 on GigabitEthernet5/39
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.41c8 on GigabitEthernet2/38
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.41d2 on GigabitEthernet2/9
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.41e0 on GigabitEthernet2/40
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.41e2 on GigabitEthernet2/42
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.41e3 on GigabitEthernet2/44
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.41e5 on GigabitEthernet2/48
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.41e9 on GigabitEthernet2/16
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.41fd on GigabitEthernet2/14
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4206 on GigabitEthernet2/22
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4215 on GigabitEthernet2/24
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4216 on GigabitEthernet2/20
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4217 on GigabitEthernet2/26
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.421c on GigabitEthernet2/30
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.421f on GigabitEthernet2/28
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4247 on GigabitEthernet2/31
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.42ff on GigabitEthernet5/2
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4395 on GigabitEthernet2/18
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.44e3 on GigabitEthernet2/34
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4675 on GigabitEthernet5/4
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4839 on GigabitEthernet2/35
+[14:02:36][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.8b90 on GigabitEthernet2/12
+[14:02:36][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 210"
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0338 on GigabitEthernet2/8
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.039c on GigabitEthernet2/3
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.053b on GigabitEthernet1/43
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0595 on GigabitEthernet1/1
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.05d6 on GigabitEthernet1/14
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0603 on GigabitEthernet5/11
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0711 on GigabitEthernet1/38
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.082e on GigabitEthernet2/6
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.08b0 on GigabitEthernet1/46
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.09f0 on GigabitEthernet2/38
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0a0e on GigabitEthernet1/10
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0b26 on GigabitEthernet5/39
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0c61 on GigabitEthernet5/2
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0c84 on GigabitEthernet1/20
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0cfc on GigabitEthernet1/28
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0da1 on GigabitEthernet1/34
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0dce on GigabitEthernet1/6
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0df6 on GigabitEthernet1/40
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0e6e on GigabitEthernet5/41
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0fd6 on GigabitEthernet1/48
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1008 on GigabitEthernet2/9
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.101c on GigabitEthernet1/32
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1210 on GigabitEthernet2/28
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.126a on GigabitEthernet2/20
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.13be on GigabitEthernet1/36
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.13cd on GigabitEthernet2/44
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1530 on GigabitEthernet1/41
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.15f3 on GigabitEthernet2/35
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.15fd on GigabitEthernet2/31
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.177e on GigabitEthernet5/4
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.17d3 on GigabitEthernet1/26
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.18af on GigabitEthernet2/48
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1927 on GigabitEthernet1/30
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1a44 on GigabitEthernet1/7
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1af3 on GigabitEthernet1/24
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1cb5 on GigabitEthernet1/16
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1dd2 on GigabitEthernet2/18
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2020 on GigabitEthernet2/42
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2039 on GigabitEthernet2/14
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2057 on GigabitEthernet1/22
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.21c4 on GigabitEthernet2/34
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2255 on GigabitEthernet2/22
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.233b on GigabitEthernet2/40
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.25bb on GigabitEthernet1/4
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2610 on GigabitEthernet2/30
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2638 on GigabitEthernet2/12
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.274b on GigabitEthernet2/26
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.28ea on GigabitEthernet2/16
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2a89 on GigabitEthernet5/8
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2a8e on GigabitEthernet1/18
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2ab6 on GigabitEthernet2/24
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2eb7 on GigabitEthernet5/6
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5598 on GigabitEthernet5/48
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5618 on GigabitEthernet5/47
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.568e on GigabitEthernet5/46
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.58b4 on GigabitEthernet5/45
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5b00 on GigabitEthernet5/44
+[14:02:37][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5c4e on GigabitEthernet5/42
+[14:02:37][INFO][2160][process_device_data:390] ... Finished processing data on the network device.
+[14:02:37][INFO][2160][disconnect_from_device:439] Disconnected from DCR-SPA12-Access (10.201.17.87)
+[14:02:37][INFO][2160][connect_to_device:337] ===> Connecting to DCR-SPA14-Access (10.201.16.252)
+[14:02:37][INFO][2160][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[14:02:37][INFO][2160][_log:1893] Auth banner: b'CCCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[14:02:37][INFO][2160][_log:1893] Authentication (password) successful!
+[14:02:38][INFO][2160][connect_to_device:340] <=== Received DCR-SPA14-Access (10.201.16.252)
+[14:02:38][INFO][2160][process_device_data:379] Processing data on the network device ...
+[14:02:38][INFO][2160][send_command:421] Executing command: "show vlan brief"
+[14:02:38][INFO][2160][extract_voip_vlans:150]   VoIP VLANs found: [230, 397]
+[14:02:38][INFO][2160][extract_ap_vlans:164]   AP VLANs found: [210]
+[14:02:38][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 230"
+[14:02:38][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 397"
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.2ed3 on GigabitEthernet1/6
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.3087 on GigabitEthernet1/37
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.308e on GigabitEthernet1/40
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.3185 on GigabitEthernet1/42
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.31fe on GigabitEthernet1/44
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.320e on GigabitEthernet1/48
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.3213 on GigabitEthernet1/46
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.325e on GigabitEthernet1/13
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.3265 on GigabitEthernet1/16
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.32b5 on GigabitEthernet1/21
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.32eb on GigabitEthernet1/4
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.3415 on GigabitEthernet1/18
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.42f7 on GigabitEthernet1/20
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.42f9 on GigabitEthernet1/24
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.42fc on GigabitEthernet1/30
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4306 on GigabitEthernet1/26
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4307 on GigabitEthernet1/27
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.4311 on GigabitEthernet1/32
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.431c on GigabitEthernet1/34
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.432e on GigabitEthernet1/36
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.438e on GigabitEthernet2/6
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.44e5 on GigabitEthernet2/4
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.554f on GigabitEthernet1/2
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.566a on GigabitEthernet1/7
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 1cd1.e08a.5814 on GigabitEthernet1/10
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 70f0.9652.8028 on GigabitEthernet2/8
+[14:02:39][INFO][2160][send_command:421] Executing command: "show mac address-table vlan 210"
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.03e7 on GigabitEthernet1/24
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.049b on GigabitEthernet1/32
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.06d0 on GigabitEthernet1/42
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0892 on GigabitEthernet2/6
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0941 on GigabitEthernet1/46
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0a77 on GigabitEthernet1/21
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0b17 on GigabitEthernet2/4
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0b85 on GigabitEthernet1/18
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0c25 on GigabitEthernet2/8
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.0e19 on GigabitEthernet1/13
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1111 on GigabitEthernet1/27
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.120b on GigabitEthernet1/34
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1238 on GigabitEthernet1/4
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1274 on GigabitEthernet1/6
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1cab on GigabitEthernet1/20
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1d55 on GigabitEthernet1/10
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.1de6 on GigabitEthernet1/7
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.21ab on GigabitEthernet1/2
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2471 on GigabitEthernet1/48
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.24da on GigabitEthernet1/36
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2665 on GigabitEthernet1/30
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.278c on GigabitEthernet1/16
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2908 on GigabitEthernet1/44
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2aca on GigabitEthernet1/37
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2cd2 on GigabitEthernet1/40
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered 204c.03bb.2e2b on GigabitEthernet1/26
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5718 on GigabitEthernet2/10
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.58c6 on GigabitEthernet2/9
+[14:02:39][INFO][2160][log_discovered_mac:213]   Discovered bc9f.e4c7.5c18 on GigabitEthernet2/12
+[14:02:39][INFO][2160][process_device_data:390] ... Finished processing data on the network device.
+[14:02:39][INFO][2160][disconnect_from_device:439] Disconnected from DCR-SPA14-Access (10.201.16.252)
+[14:02:39][INFO][2160][safe_exit:319] The script required 13.88 seconds to finish processing on 6 devices.
+[14:02:39][INFO][2160][safe_exit:321] Script execution completed: 2023-12-01 14:02:39

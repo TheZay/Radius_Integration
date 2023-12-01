@@ -22,6 +22,7 @@ def setup_logging() -> None:
     :return: None
     """
     log_file_name = f'logs\\nmc_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
+    log_file_name = f'logs\\nmc_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
     file_formatter = logging.Formatter(
         '[%(asctime)s][%(levelname)s][%(process)d][%(funcName)s:%(lineno)d] %(message)s',
         datefmt='%H:%M:%S')
@@ -198,11 +199,12 @@ def log_discovered_mac(mac_address: str, port: str) -> None:
     logging.info(f'  Discovered {mac_address} on {port}')
 
 
-def export_xml(mac_address_set: set[str], input_file_name: str) -> None:
+def export_xml(mac_address_set: set[str], input_file_name: str, output_folder_name: str = 'data') -> None:
     """
     Exports MAC addresses to an XML file for ClearPass integration.
     :param mac_address_set: Set of MAC addresses
     :param input_file_name: Input file name
+    :param output_folder_name: Output folder name
     :return: None
     """
     base_file_name = os.path.splitext(os.path.basename(input_file_name))[0]
@@ -213,7 +215,7 @@ def export_xml(mac_address_set: set[str], input_file_name: str) -> None:
     logging.debug(f'Generated XML:\n{xml_string_debug}')
 
     xml_string = create_formatted_xml(root)
-    save_formatted_xml(xml_string, base_file_name)
+    save_formatted_xml(xml_string, base_file_name, output_folder_name)
 
 
 def create_xml_structure(mac_address_set: set[str], base_file_name: str) -> ET.Element:
@@ -271,16 +273,15 @@ def create_formatted_xml(root: ET.Element) -> str:
     return dom.toprettyxml(encoding="UTF-8").decode()
 
 
-def save_formatted_xml(xml_string: str, base_file_name: str) -> None:
+def save_formatted_xml(xml_string: str, base_file_name: str, output_folder_name: str) -> None:
     """
     Saves the formatted XML to a file.
     :param xml_string: Formatted XML string
     :param base_file_name: Base file name
+    :param output_folder_name: Output folder name
     :return: None
     """
-    # Debug: Print the XML string before writing to the file
-    logging.debug(f'Saving XML to file:\n{xml_string}')
-    output_file_name = f'{os.path.expanduser('~\\Downloads')}\\{base_file_name}.xml'
+    output_file_name = f'{output_folder_name}/{base_file_name}.xml'
     with open(output_file_name, 'wb') as xml_file:
         xml_file.write(xml_string.encode())
 
@@ -470,7 +471,7 @@ def main(yaml_file: str) -> None:
     mac_addresses = process_devices(devices, credentials)
 
     # Export the MAC addresses into an XML file for ClearPass to import
-    export_xml(mac_addresses, yaml_file)
+    export_xml(mac_addresses, yaml_file, output_folder_name='data')
     # export_txt(mac_addresses, yaml_file)
 
     # Script completion into a safe exit
