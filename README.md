@@ -8,7 +8,7 @@ The Switch Data Retrieval Script is designed to collect data from network switch
 
 Before using the script, make sure you have the following:
 
-- Python installed (version x.x or later)
+- Python installed (version 3.6 or later)
 - Netmiko library installed (`pip install netmiko`)
 - YAML file containing the network device inventory
 
@@ -39,7 +39,7 @@ Before using the script, make sure you have the following:
 ## Examples
 
 ```bash
-python switch_data_retrieval.py DCR_Spa_Tower.yaml
+python SwitchMacCollector.py "DCR Spa Tower.yaml"
 ```
 
 ## Notes
@@ -49,7 +49,3 @@ python switch_data_retrieval.py DCR_Spa_Tower.yaml
 ## Disclaimer
 
 This script is provided as-is without any warranties. Use it at your own risk and review the code to ensure it fits your specific use case.
-
----
-
-Feel free to customize this template based on additional information or specific instructions related to your script.
