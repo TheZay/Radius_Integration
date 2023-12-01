@@ -38,8 +38,8 @@ Before using the script, make sure you have the following:
 
 ## Examples
 
-```cmd
-python SwitchMacCollector.py "DCR Spa Tower.yaml"
+```bash
+python switch_data_retrieval.py DCR_Spa_Tower.yaml
 ```
 
 ## Notes
