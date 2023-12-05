@@ -35,7 +35,7 @@ def setup_logging() -> None:
     console_handler.setFormatter(console_formatter)
     logging.getLogger().addHandler(console_handler)
 
-    logging.getLogger().setLevel(logging.INFO)
+    logging.getLogger().setLevel(logging.DEBUG)
 
 
 def get_credentials() -> dict:
@@ -155,22 +155,21 @@ def extract_mac_addresses(mac_address_table: list[dict]) -> set[str]:
     mac_addresses = set()
     po_pattern = re.compile(r'(?i)(Po|Port-Channel|Switch)')
 
-    if isinstance(mac_address_table, dict):
-        for mac_entry in mac_address_table:
-            mac_address = mac_entry.get('destination_address')
-            interface = mac_entry.get('destination_port')
+    for mac_entry in mac_address_table:
+        mac_address = mac_entry.get('destination_address')
+        interface = mac_entry.get('destination_port')
 
-            if isinstance(interface, list):
-                # Handle the case where destination_port is a list
-                for port in interface:
-                    if not po_pattern.match(port) and is_valid_mac(mac_address):
-                        log_discovered_mac(mac_address, port)
-                        mac_addresses.add(mac_address)
-            elif isinstance(interface, str):
-                # Handle the case where destination_port is a string
-                if not po_pattern.match(interface) and is_valid_mac(mac_address):
-                    log_discovered_mac(mac_address, interface)
+        if isinstance(interface, list):
+            # Handle the case where destination_port is a list
+            for port in interface:
+                if not po_pattern.match(port) and is_valid_mac(mac_address):
+                    log_discovered_mac(mac_address, port)
                     mac_addresses.add(mac_address)
+        elif isinstance(interface, str):
+            # Handle the case where destination_port is a string
+            if not po_pattern.match(interface) and is_valid_mac(mac_address):
+                log_discovered_mac(mac_address, interface)
+                mac_addresses.add(mac_address)
 
     return mac_addresses
 
@@ -206,8 +205,8 @@ def export_xml(mac_address_set: set[str], input_file_name: str) -> None:
     root = create_xml_structure(mac_address_set, base_file_name)
 
     # Debug: Print the generated XML structure
-    xml_string = ET.tostring(root, encoding="UTF-8").decode("utf-8")
-    logging.debug(f'Generated XML:\n{xml_string}')
+    xml_string_debug = ET.tostring(root, encoding="UTF-8").decode("utf-8")
+    logging.debug(f'Generated XML:\n{xml_string_debug}')
 
     xml_string = create_formatted_xml(root)
     save_formatted_xml(xml_string, base_file_name)
@@ -249,7 +248,7 @@ def create_member_element(members: ET.SubElement, mac_address: str) -> None:
     :param mac_address: MAC address to add as a member
     :return: None
     """
-    member = ET.SubElement(
+    ET.SubElement(
         members,
         "Member",
         description=mac_address.replace(".", ""),
@@ -275,6 +274,8 @@ def save_formatted_xml(xml_string: str, base_file_name: str) -> None:
     :param base_file_name: Base file name
     :return: None
     """
+    # Debug: Print the XML string before writing to the file
+    logging.debug(f'Saving XML to file:\n{xml_string}')
     output_file_name = f'.\\data\\{base_file_name}.xml'
     with open(output_file_name, 'wb') as xml_file:
         xml_file.write(xml_string.encode("utf-8"))
