@@ -1,22 +1,3 @@
-"""
-Switch Data Retrieval Script
-
-This script is designed to collect data from network switches in an environment, specifically focusing on devices
-related to Voice over IP (VoIP) and Access Points (APs). The primary goal is to extract MAC addresses associated with
-these devices, allowing for the creation of an XML file. This XML file can be utilized in network authentication
-systems, such as ClearPass, for Radius integration.
-
-Script Workflow:
-1. Configure logging for both file and console outputs.
-2. Retrieve user credentials for accessing network devices.
-3. Load the network device inventory from a YAML file.
-4. Optionally filter devices based on a user-specified filter.
-5. Connect to each device, retrieve VLAN brief information, and identify VoIP and AP VLANs.
-6. Retrieve MAC addresses associated with the identified VLANs.
-7. Export the collected MAC addresses into an XML file for further integration.
-
-Note: Ensure that Netmiko and the necessary dependencies are installed before running this script.
-"""
 from datetime import datetime, timezone
 from netmiko import ConnectHandler, NetmikoTimeoutException, NetMikoAuthenticationException
 from xml.dom import minidom
@@ -174,21 +155,22 @@ def extract_mac_addresses(mac_address_table: list[dict]) -> set[str]:
     mac_addresses = set()
     po_pattern = re.compile(r'(?i)(Po|Port-Channel|Switch)')
 
-    for mac_entry in mac_address_table:
-        mac_address = mac_entry.get('destination_address')
-        interface = mac_entry.get('destination_port')
+    if isinstance(mac_address_table, dict):
+        for mac_entry in mac_address_table:
+            mac_address = mac_entry.get('destination_address')
+            interface = mac_entry.get('destination_port')
 
-        if isinstance(interface, list):
-            # Handle the case where destination_port is a list
-            for port in interface:
-                if not po_pattern.match(port) and is_valid_mac(mac_address):
-                    log_discovered_mac(mac_address, port)
+            if isinstance(interface, list):
+                # Handle the case where destination_port is a list
+                for port in interface:
+                    if not po_pattern.match(port) and is_valid_mac(mac_address):
+                        log_discovered_mac(mac_address, port)
+                        mac_addresses.add(mac_address)
+            elif isinstance(interface, str):
+                # Handle the case where destination_port is a string
+                if not po_pattern.match(interface) and is_valid_mac(mac_address):
+                    log_discovered_mac(mac_address, interface)
                     mac_addresses.add(mac_address)
-        elif isinstance(interface, str):
-            # Handle the case where destination_port is a string
-            if not po_pattern.match(interface) and is_valid_mac(mac_address):
-                log_discovered_mac(mac_address, interface)
-                mac_addresses.add(mac_address)
 
     return mac_addresses
 
@@ -213,18 +195,22 @@ def log_discovered_mac(mac_address: str, port: str) -> None:
     logging.info(f'  Discovered {mac_address} on {port}')
 
 
-def export_xml(mac_address_set: set[str], input_file_name: str, output_folder_name: str = 'data') -> None:
+def export_xml(mac_address_set: set[str], input_file_name: str) -> None:
     """
     Exports MAC addresses to an XML file for ClearPass integration.
     :param mac_address_set: Set of MAC addresses
     :param input_file_name: Input file name
-    :param output_folder_name: Output folder name
     :return: None
     """
     base_file_name = os.path.splitext(os.path.basename(input_file_name))[0]
     root = create_xml_structure(mac_address_set, base_file_name)
+
+    # Debug: Print the generated XML structure
+    xml_string = ET.tostring(root, encoding="UTF-8").decode("utf-8")
+    logging.debug(f'Generated XML:\n{xml_string}')
+
     xml_string = create_formatted_xml(root)
-    save_formatted_xml(xml_string, base_file_name, output_folder_name)
+    save_formatted_xml(xml_string, base_file_name)
 
 
 def create_xml_structure(mac_address_set: set[str], base_file_name: str) -> ET.Element:
@@ -282,15 +268,14 @@ def create_formatted_xml(root: ET.Element) -> str:
     return dom.toprettyxml(indent="\t", encoding="UTF-8").decode("utf-8")
 
 
-def save_formatted_xml(xml_string: str, base_file_name: str, output_folder_name: str) -> None:
+def save_formatted_xml(xml_string: str, base_file_name: str) -> None:
     """
     Saves the formatted XML to a file.
     :param xml_string: Formatted XML string
     :param base_file_name: Base file name
-    :param output_folder_name: Output folder name
     :return: None
     """
-    output_file_name = f'{output_folder_name}/{base_file_name}.xml'
+    output_file_name = f'.\\data\\{base_file_name}.xml'
     with open(output_file_name, 'wb') as xml_file:
         xml_file.write(xml_string.encode("utf-8"))
 
@@ -303,7 +288,7 @@ def export_txt(mac_address_set: set[str], input_file_name: str) -> None:
     :return: None
     """
     output_file_name = f'{os.path.splitext(os.path.basename(input_file_name))[0]}.txt'
-    with open(output_file_name, 'w') as outfile:
+    with open(f'.\\data\\{output_file_name}', 'w') as outfile:
         for mac_address in mac_address_set:
             outfile.write(mac_address + '\n')
 
@@ -456,7 +441,7 @@ def main(yaml_file: str) -> None:
 
     # Read the YAML file and find inventory to run commands on
     # yaml_file = 'DCR Spa Tower.yaml'
-    with open(yaml_file) as f:
+    with open(f'data/{yaml_file}') as f:
         inventory = yaml.safe_load(f.read())
     dev_filter = input('\n\nSpecify device filter: ')
     devices = get_devices(inventory, dev_filter)
@@ -467,7 +452,7 @@ def main(yaml_file: str) -> None:
     mac_addresses = process_devices(devices, credentials)
 
     # Export the MAC addresses into an XML file for ClearPass to import
-    export_xml(mac_addresses, yaml_file, output_folder_name='data')
+    export_xml(mac_addresses, yaml_file)
     # export_txt(mac_addresses, yaml_file)
 
     # Script completion into a safe exit

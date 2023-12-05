@@ -1,0 +1,87 @@
+[12:27:41][INFO][19184][main:436] Script execution started: 2023-12-05 12:27:41
+[12:27:50][INFO][19184][connect_to_device:324] ===> Connecting to DCR-SPA3-Access (10.201.16.76)
+[12:27:50][INFO][19184][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[12:27:50][INFO][19184][_log:1893] Auth banner: b'CCCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[12:27:50][INFO][19184][_log:1893] Authentication (password) successful!
+[12:27:51][INFO][19184][connect_to_device:327] <=== Received DCR-SPA3-Access (10.201.16.76)
+[12:27:51][INFO][19184][process_device_data:366] Processing data on the network device ...
+[12:27:51][INFO][19184][send_command:408] Executing command: "show vlan brief"
+[12:27:51][INFO][19184][extract_voip_vlans:131]   VoIP VLANs found: [387, 388]
+[12:27:51][INFO][19184][extract_ap_vlans:145]   AP VLANs found: [210]
+[12:27:51][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 387"
+[12:27:51][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 388"
+[12:27:52][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 210"
+[12:27:52][INFO][19184][process_device_data:377] ... Finished processing data on the network device.
+[12:27:52][INFO][19184][disconnect_from_device:426] Disconnected from DCR-SPA3-Access (10.201.16.76)
+[12:27:52][INFO][19184][connect_to_device:324] ===> Connecting to DCR-SPA6-Access (10.201.16.135)
+[12:27:52][INFO][19184][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[12:27:53][INFO][19184][_log:1893] Auth banner: b'CCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[12:27:53][INFO][19184][_log:1893] Authentication (password) successful!
+[12:27:53][INFO][19184][connect_to_device:327] <=== Received DCR-SPA6-Access (10.201.16.135)
+[12:27:53][INFO][19184][process_device_data:366] Processing data on the network device ...
+[12:27:53][INFO][19184][send_command:408] Executing command: "show vlan brief"
+[12:27:53][INFO][19184][extract_voip_vlans:131]   VoIP VLANs found: [389, 390]
+[12:27:53][INFO][19184][extract_ap_vlans:145]   AP VLANs found: [210]
+[12:27:53][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 389"
+[12:27:54][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 390"
+[12:27:54][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 210"
+[12:27:54][INFO][19184][process_device_data:377] ... Finished processing data on the network device.
+[12:27:54][INFO][19184][disconnect_from_device:426] Disconnected from DCR-SPA6-Access (10.201.16.135)
+[12:27:54][INFO][19184][connect_to_device:324] ===> Connecting to DCR-SPA8-Access (10.201.16.191)
+[12:27:54][INFO][19184][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[12:27:55][INFO][19184][_log:1893] Auth banner: b'CCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[12:27:55][INFO][19184][_log:1893] Authentication (password) successful!
+[12:27:55][INFO][19184][connect_to_device:327] <=== Received DCR-SPA8-Access (10.201.16.191)
+[12:27:55][INFO][19184][process_device_data:366] Processing data on the network device ...
+[12:27:55][INFO][19184][send_command:408] Executing command: "show vlan brief"
+[12:27:56][INFO][19184][extract_voip_vlans:131]   VoIP VLANs found: [391, 392]
+[12:27:56][INFO][19184][extract_ap_vlans:145]   AP VLANs found: [210]
+[12:27:56][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 391"
+[12:27:56][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 392"
+[12:27:56][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 210"
+[12:27:57][INFO][19184][process_device_data:377] ... Finished processing data on the network device.
+[12:27:57][INFO][19184][disconnect_from_device:426] Disconnected from DCR-SPA8-Access (10.201.16.191)
+[12:27:57][INFO][19184][connect_to_device:324] ===> Connecting to DCR-SPA10-Access (10.201.16.253)
+[12:27:57][INFO][19184][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[12:27:57][INFO][19184][_log:1893] Auth banner: b'CCCCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[12:27:57][INFO][19184][_log:1893] Authentication (password) successful!
+[12:27:58][INFO][19184][connect_to_device:327] <=== Received DCR-SPA10-Access (10.201.16.253)
+[12:27:58][INFO][19184][process_device_data:366] Processing data on the network device ...
+[12:27:58][INFO][19184][send_command:408] Executing command: "show vlan brief"
+[12:27:58][INFO][19184][extract_voip_vlans:131]   VoIP VLANs found: [393, 394]
+[12:27:58][INFO][19184][extract_ap_vlans:145]   AP VLANs found: [210]
+[12:27:58][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 393"
+[12:27:58][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 394"
+[12:27:58][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 210"
+[12:27:59][INFO][19184][process_device_data:377] ... Finished processing data on the network device.
+[12:27:59][INFO][19184][disconnect_from_device:426] Disconnected from DCR-SPA10-Access (10.201.16.253)
+[12:27:59][INFO][19184][connect_to_device:324] ===> Connecting to DCR-SPA12-Access (10.201.17.87)
+[12:27:59][INFO][19184][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[12:27:59][INFO][19184][_log:1893] Auth banner: b'CCCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[12:27:59][INFO][19184][_log:1893] Authentication (password) successful!
+[12:28:00][INFO][19184][connect_to_device:327] <=== Received DCR-SPA12-Access (10.201.17.87)
+[12:28:00][INFO][19184][process_device_data:366] Processing data on the network device ...
+[12:28:00][INFO][19184][send_command:408] Executing command: "show vlan brief"
+[12:28:00][INFO][19184][extract_voip_vlans:131]   VoIP VLANs found: [395, 396]
+[12:28:00][INFO][19184][extract_ap_vlans:145]   AP VLANs found: [210]
+[12:28:00][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 395"
+[12:28:00][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 396"
+[12:28:01][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 210"
+[12:28:01][INFO][19184][process_device_data:377] ... Finished processing data on the network device.
+[12:28:01][INFO][19184][disconnect_from_device:426] Disconnected from DCR-SPA12-Access (10.201.17.87)
+[12:28:01][INFO][19184][connect_to_device:324] ===> Connecting to DCR-SPA14-Access (10.201.16.252)
+[12:28:01][INFO][19184][_log:1893] Connected (version 1.99, client Cisco-1.25)
+[12:28:01][INFO][19184][_log:1893] Auth banner: b'CCCCC\r\nUNAUTHORIZED ACCESS TO THIS NETWORK DEVICE IS PROHIBITED. \r\nYou must have explicit permission to access or configure this device. \r\nAll activities performed on this device may be logged, and violations\r\nof this policy may result in disciplinary action, and may be reported to \r\nlaw enforcement. There is no right to privacy on this device.\r\n'
+[12:28:01][INFO][19184][_log:1893] Authentication (password) successful!
+[12:28:02][INFO][19184][connect_to_device:327] <=== Received DCR-SPA14-Access (10.201.16.252)
+[12:28:02][INFO][19184][process_device_data:366] Processing data on the network device ...
+[12:28:02][INFO][19184][send_command:408] Executing command: "show vlan brief"
+[12:28:02][INFO][19184][extract_voip_vlans:131]   VoIP VLANs found: [230, 397]
+[12:28:02][INFO][19184][extract_ap_vlans:145]   AP VLANs found: [210]
+[12:28:02][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 230"
+[12:28:03][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 397"
+[12:28:03][INFO][19184][send_command:408] Executing command: "show mac address-table vlan 210"
+[12:28:03][INFO][19184][process_device_data:377] ... Finished processing data on the network device.
+[12:28:03][INFO][19184][disconnect_from_device:426] Disconnected from DCR-SPA14-Access (10.201.16.252)
+[12:28:03][INFO][19184][safe_exit:306] The script required 13.53 seconds to finish processing on 6 devices.
+[12:28:03][INFO][19184][safe_exit:308] Script execution completed: 2023-12-05 12:28:03
