@@ -1,3 +1,6 @@
+from datetime import datetime, timezone
+from netmiko import ConnectHandler, NetmikoTimeoutException, NetMikoAuthenticationException
+from xml.dom import minidom
 import logging
 import logging.config
 import msvcrt
@@ -160,21 +163,22 @@ def extract_mac_addresses(mac_address_table: list[dict]) -> set[str]:
     mac_addresses = set()
     po_pattern = re.compile(r'(?i)(Po|Port-Channel|Switch)')
 
-    for mac_entry in mac_address_table:
-        mac_address = mac_entry.get('destination_address')
-        interface = mac_entry.get('destination_port')
+    if isinstance(mac_address_table, dict):
+        for mac_entry in mac_address_table:
+            mac_address = mac_entry.get('destination_address')
+            interface = mac_entry.get('destination_port')
 
-        if isinstance(interface, list):
-            # Handle the case where destination_port is a list
-            for port in interface:
-                if not po_pattern.match(port) and mac_address and is_valid_mac(mac_address):
-                    log_discovered_mac(mac_address, port)
+            if isinstance(interface, list):
+                # Handle the case where destination_port is a list
+                for port in interface:
+                    if not po_pattern.match(port) and mac_address and is_valid_mac(mac_address):
+                        log_discovered_mac(mac_address, port)
+                        mac_addresses.add(mac_address)
+            elif isinstance(interface, str):
+                # Handle the case where destination_port is a string
+                if not po_pattern.match(interface) and mac_address and is_valid_mac(mac_address):
+                    log_discovered_mac(mac_address, interface)
                     mac_addresses.add(mac_address)
-        elif isinstance(interface, str):
-            # Handle the case where destination_port is a string
-            if not po_pattern.match(interface) and mac_address and is_valid_mac(mac_address):
-                log_discovered_mac(mac_address, interface)
-                mac_addresses.add(mac_address)
 
     return mac_addresses
 
@@ -199,23 +203,22 @@ def log_discovered_mac(mac_address: str, port: str) -> None:
     logging.info(f'  Discovered {mac_address} on {port}')
 
 
-def export_xml(mac_address_set: set[str], input_file_name: str, output_folder_name: str = 'data') -> None:
+def export_xml(mac_address_set: set[str], input_file_name: str) -> None:
     """
     Exports MAC addresses to an XML file for ClearPass integration.
     :param mac_address_set: Set of MAC addresses
     :param input_file_name: Input file name
-    :param output_folder_name: Output folder name
     :return: None
     """
     base_file_name = os.path.splitext(os.path.basename(input_file_name))[0]
     root = create_xml_structure(mac_address_set, base_file_name)
 
     # Debug: Print the generated XML structure
-    xml_string_debug = ET.tostring(root, encoding="UTF-8").decode("utf-8")
-    logging.debug(f'Generated XML:\n{xml_string_debug}')
+    xml_string = ET.tostring(root, encoding="UTF-8").decode("utf-8")
+    logging.debug(f'Generated XML:\n{xml_string}')
 
     xml_string = create_formatted_xml(root)
-    save_formatted_xml(xml_string, base_file_name, output_folder_name)
+    save_formatted_xml(xml_string, base_file_name)
 
 
 def create_xml_structure(mac_address_set: set[str], base_file_name: str) -> ET.Element:
@@ -273,15 +276,14 @@ def create_formatted_xml(root: ET.Element) -> str:
     return dom.toprettyxml(encoding="UTF-8").decode()
 
 
-def save_formatted_xml(xml_string: str, base_file_name: str, output_folder_name: str) -> None:
+def save_formatted_xml(xml_string: str, base_file_name: str) -> None:
     """
     Saves the formatted XML to a file.
     :param xml_string: Formatted XML string
     :param base_file_name: Base file name
-    :param output_folder_name: Output folder name
     :return: None
     """
-    output_file_name = f'{output_folder_name}/{base_file_name}.xml'
+    output_file_name = f'.\\data\\{base_file_name}.xml'
     with open(output_file_name, 'wb') as xml_file:
         xml_file.write(xml_string.encode())
 
@@ -471,7 +473,7 @@ def main(yaml_file: str) -> None:
     mac_addresses = process_devices(devices, credentials)
 
     # Export the MAC addresses into an XML file for ClearPass to import
-    export_xml(mac_addresses, yaml_file, output_folder_name='data')
+    export_xml(mac_addresses, yaml_file)
     # export_txt(mac_addresses, yaml_file)
 
     # Script completion into a safe exit

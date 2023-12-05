@@ -1,13 +1,32 @@
-# Default ignored files
-/shelf/
-/workspace.xml
+# Ignore virtual environment
+venv/
 
-# Non-default ignored fiels
-/old_data/
+# Ignore compiled Python files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.vscode/
-*.log\
+
+# Ignore environment-specific files
+.env
+*.env
+
+# Ignore IDE-specific files and directories
+.idea/
+
+# Ignore log files
+logs/
+*.log
+
+# Ignore compiled binaries
+*.dll
+*.exe
+
+# Ignore user-specific files
+*.iml
+.DS_Store
+
+# Ignore XML and YAML data files
+data/
 *.xml
+*.yaml
