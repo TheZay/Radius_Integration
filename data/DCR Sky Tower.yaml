@@ -1,0 +1,105 @@
+common_vars:
+  device_type: cisco_ios
+
+hosts:
+  - hostname: DCR-IDF-ST3.1-FL02
+    host: 10.255.229.21
+
+  - hostname: DCR-IDF-ST3.1-FL03
+    host: 10.255.229.22
+
+  - hostname: DCR-IDF-ST3.1-FL05
+    host: 10.255.229.23
+
+  - hostname: DCR-IDF-ST3.2-DIST
+    host: 10.255.229.10
+
+  - hostname: DCR-IDF-ST7.1-FL06
+    host: 10.255.229.24
+
+  - hostname: DCR-IDF-ST7.1-FL07
+    host: 10.255.229.25
+
+  - hostname: DCR-IDF-ST7.1-FL08
+    host: 10.255.229.26
+
+  - hostname: DCR-IDF-ST7.2-FL06
+    host: 10.255.229.27
+
+  - hostname: DCR-IDF-ST7.2-FL07
+    host: 10.255.229.28
+
+  - hostname: DCR-IDF-ST7.2-FL08
+    host: 10.255.229.29
+
+  - hostname: DCR-IDF-ST10.1-FL09
+    host: 10.255.229.30
+
+  - hostname: DCR-IDF-ST10.1-FL10
+    host: 10.255.229.31
+
+  - hostname: DCR-IDF-ST10.1-FL11
+    host: 10.255.229.32
+
+  - hostname: DCR-IDF-ST10.2-FL09
+    host: 10.255.229.33
+
+  - hostname: DCR-IDF-ST10.2-FL10
+    host: 10.255.229.34
+
+  - hostname: DCR-IDF-ST10.2-FL11
+    host: 10.255.229.35
+
+  - hostname: DCR-IDF-ST14.1-FL12
+    host: 10.255.229.36
+
+  - hostname: DCR-IDF-ST14.1-FL14
+    host: 10.255.229.37
+
+  - hostname: DCR-IDF-ST14.1-FL15
+    host: 10.255.229.38
+
+  - hostname: DCR-IDF-ST14.2-FL12
+    host: 10.255.229.39
+
+  - hostname: DCR-IDF-ST14.2-FL14
+    host: 10.255.229.40
+
+  - hostname: DCR-IDF-ST14.2-FL15
+    host: 10.255.229.41
+
+  - hostname: DCR-IDF-ST17.1-FL16
+    host: 10.255.229.42
+
+  - hostname: DCR-IDF-ST17.1-FL17
+    host: 10.255.229.43
+
+  - hostname: DCR-IDF-ST17.1-FL18
+    host: 10.255.229.44
+
+  - hostname: DCR-IDF-ST17.2-FL16
+    host: 10.255.229.45
+
+  - hostname: DCR-IDF-ST17.2-FL17
+    host: 10.255.229.46
+
+  - hostname: DCR-IDF-ST17.2-FL18
+    host: 10.255.229.47
+
+  - hostname: DCR-IDF-ST20.1-FL19
+    host: 10.255.229.48
+
+  - hostname: DCR-IDF-ST20.1-FL20
+    host: 10.255.229.49
+
+  - hostname: DCR-IDF-ST20.1-FL21
+    host: 10.255.229.50
+
+  - hostname: DCR-IDF-ST20.2-FL19
+    host: 10.255.229.51
+
+  - hostname: DCR-IDF-ST20.2-FL20
+    host: 10.255.229.52
+
+  - hostname: DCR-IDF-ST20.2-FL21
+    host: 10.255.229.53

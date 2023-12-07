@@ -1,0 +1,32 @@
+# Ignore virtual environment
+venv/
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore environment-specific files
+.env
+*.env
+
+# Ignore IDE-specific files and directories
+.idea/
+
+# Ignore log files
+logs/
+*.log
+
+# Ignore compiled binaries
+*.dll
+*.exe
+
+# Ignore user-specific files
+*.iml
+.DS_Store
+
+# Ignore XML and YAML data files
+data/
+*.xml
+*.yaml
