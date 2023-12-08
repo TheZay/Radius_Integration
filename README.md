@@ -12,6 +12,14 @@ Before using the script, make sure you have the following:
 - Netmiko library installed (`pip install netmiko`)
 - YAML file containing the network device inventory
 
+## Installation
+
+User the package manager [pip](https://pip.pypa.io/en/stable/) to install netmiko.
+
+```bash
+pip install netmiko
+```
+
 ## Usage
 
 1. **Configure Logging:**
@@ -39,12 +47,15 @@ Before using the script, make sure you have the following:
 ## Examples
 
 ```bash
-python switch_data_retrieval.py DCR_Spa_Tower.yaml
+# Run the script with a YAML file in the current directory
+python SwitchMacCollector.py "DCR Spa Tower.yaml"
+
+# Run the script with a YAML file in a different directory
+python SwitchMacCollector.py "/path/to/your/yaml/file.yaml"
+
+# Run the script with a YAML file in the parent directory
+python SwitchMacCollector.py "../another_directory.yaml"
 ```
-
-## Notes
-
-- Ensure that Netmiko and its necessary dependencies are installed before running the script.
 
 ## Disclaimer
 
