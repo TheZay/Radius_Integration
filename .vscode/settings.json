@@ -1,4 +1,19 @@
 {
     "python.analysis.autoImportCompletions": true,
-    "python.analysis.typeCheckingMode": "basic"
+    "python.analysis.typeCheckingMode": "basic",
+    "editor.defaultFormatter": "ms-python.pylint",
+    "terminal.integrated.shellIntegration.suggestEnabled": true,
+    "python.envFile": "${workspaceFolder}/.venv",
+    "python.languageServer": "Pylance",
+    "python.testing.unittestEnabled": true,
+    "files.insertFinalNewline": true,
+    // 72: Comments & Docstrings
+    // 79: PEP8, all other lines
+    "editor.rulers": [72, 79],
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    }
 }
