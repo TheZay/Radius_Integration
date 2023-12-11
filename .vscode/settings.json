@@ -1,19 +1,33 @@
 {
+    // Python configurations
     "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "basic",
-    "editor.defaultFormatter": "ms-python.pylint",
-    "terminal.integrated.shellIntegration.suggestEnabled": true,
     "python.envFile": "${workspaceFolder}/.venv",
     "python.languageServer": "Pylance",
     "python.testing.unittestEnabled": true,
-    "files.insertFinalNewline": true,
+
+    // Linting configurations
+    "editor.defaultFormatter": "ms-python.pylint",
     // 72: Comments & Docstrings
     // 79: PEP8, all other lines
     "editor.rulers": [72, 79],
     "editor.codeActionsOnSave": {
-        "source.organizeImports": true
+        "source.organizeImports": "explicit"
     },
+    "files.insertFinalNewline": true,
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
-    }
+    },
+    
+    // RestructuredText configurations
+    "restructuredtext.editor.tableEditor.reformat.disabled": false,
+    "restructuredtext.experimental": true,
+    "restructuredtext.linter.doc8.executablePath": "${workspaceFolder}/.venv/scripts/doc8.exe",
+    "esbonio.server.pythonPath": "${workspaceFolder}/.venv/scripts/python.exe",
+    "esbonio.sphinx.buildDir": "${workspaceFolder}/docs/_build/html",
+    //"esbonio.sphinx.confDir": "${workspaceFolder}/docs/_source",
+    //"esbonio.sphinx.srcDir": "${workspaceFolder}",
+
+    // Terminal configurations
+    "terminal.integrated.shellIntegration.suggestEnabled": true
 }

@@ -29,6 +29,10 @@ Modules:
 - netmiko: Used for connecting to and interacting with network devices.
 """
 
+__author__ = 'Noah Isaac Keller'
+__maintainer__ = 'Noah Isaac Keller'
+__email__ = 'nkeller@choctawnation.com'
+
 import getpass
 import logging
 import logging.config
@@ -114,7 +118,7 @@ def get_credentials() -> dict:
         print("Password: ", end="", flush=True)
         while True:
             char = msvcrt.getch()
-            if char == b'\r' or char == b'\n':
+            if char in {b'\r', b'\n'}:  # Enter key pressed
                 break
             password += char.decode()
             print(" ", end="", flush=True)
@@ -188,15 +192,16 @@ def extract_voip_vlans(vlan_data: list[dict]) -> list[int]:
     :param vlan_data: VLAN brief data
     :return: List of VOIP VLAN IDs
     """
-    voip_pattern = re.compile(r'[Vv][Oo][Ii][Pp]')
-
-    voip_vlans = []
-    for vlan_info in vlan_data:
-        vlan_name = vlan_info.get('vlan_name')
-        if vlan_name is not None:
-            if (voip_pattern.search(vlan_name) and
-                    len(vlan_info['interfaces']) != 0):
-                voip_vlans.append(int(vlan_info['vlan_id']))
+    voip_vlans = [
+        int(vlan_info['vlan_id'])
+        for vlan_info in vlan_data
+        if (
+            'vlan_name' in vlan_info and
+            re.search(r'(?i)voip', vlan_info['vlan_name']) and
+            vlan_info['interfaces'] and
+            is_valid_vlan_id(vlan_info['vlan_id'])
+        )
+    ]
 
     logger.info("\tVoIP VLANs found: %s", voip_vlans)
     return voip_vlans
@@ -208,18 +213,28 @@ def extract_ap_vlans(vlan_data: list[dict]) -> list[int]:
     :param vlan_data: VLAN brief data
     :return: List of AP VLAN IDs
     """
-    ap_pattern = re.compile(r'(?i)AP|Access\s*')
-
-    ap_vlans = []
-    for vlan_info in vlan_data:
-        vlan_name = vlan_info.get('vlan_name')
-        if vlan_name is not None:
-            if (ap_pattern.search(vlan_name) and
-                    len(vlan_info['interfaces']) != 0):
-                ap_vlans.append(int(vlan_info['vlan_id']))
+    ap_vlans = [
+        int(vlan_info['vlan_id'])
+        for vlan_info in vlan_data
+        if (
+            'vlan_name' in vlan_info and
+            re.search(r'(?i)ap|access\s*', vlan_info['vlan_name']) and
+            vlan_info['interfaces'] and
+            is_valid_vlan_id(vlan_info['vlan_id'])
+        )
+    ]
 
     logger.info("\tAP VLANs found: %s", ap_vlans)
     return ap_vlans
+
+
+def is_valid_vlan_id(vlan_id: str) -> bool:
+    """
+    Validates a VLAN ID.
+    :param vlan_id: VLAN ID to validate
+    :return: True if valid, False otherwise
+    """
+    return vlan_id.isdigit() and 1 <= int(vlan_id) <= 4094
 
 
 def extract_mac_addresses(mac_address_table: list[dict]) -> set[str]:
@@ -233,19 +248,13 @@ def extract_mac_addresses(mac_address_table: list[dict]) -> set[str]:
 
     for mac_entry in mac_address_table:
         mac_address = mac_entry.get('destination_address')
-        interface = mac_entry.get('destination_port')
+        interfaces = mac_entry.get('destination_port')
 
-        if isinstance(interface, list):
-            # Handle the case where destination_port is a list
-            for port in interface:
-                if (not po_pattern.match(port) and
-                        mac_address and
-                        is_valid_mac(mac_address)):
-                    log_discovered_mac(mac_address, port)
-                    mac_addresses.add(mac_address)
-        elif isinstance(interface, str):
-            # Handle the case where destination_port is a string
-            if (not po_pattern.match(interface) and
+        if not isinstance(interfaces, list):
+            interfaces = [interfaces]
+
+        for interface in interfaces:
+            if (interface and not po_pattern.match(interface) and
                     mac_address and
                     is_valid_mac(mac_address)):
                 log_discovered_mac(mac_address, interface)
@@ -304,6 +313,7 @@ def create_xml_structure(
     """
     root = ET.Element(
         "TipsContents", xmlns="http://www.avendasys.com/tipsapiDefs/1.0")
+
     ET.SubElement(
         root,
         "TipsHeader",
@@ -513,7 +523,7 @@ def send_command(ssh: BaseConnection, command: str) -> list[dict]:
     elapsed_time = time.perf_counter() - execution_start_timer
     logger.debug('Command "%s" executed in %0.2f seconds.',
                   command, elapsed_time)
-
+    
     if isinstance(output, dict):
         # Handle the case where the output is a dictionary
         output = [output]
@@ -544,7 +554,7 @@ def disconnect_from_device(
 def main(yaml_file: str  = ".\\DCR Spa Tower.yaml") -> None:
     """
     Main function to execute the script.
-
+    
     :param yaml_file: YAML file containing network device inventory
     :type yaml_file: str
     :return: None
@@ -552,8 +562,7 @@ def main(yaml_file: str  = ".\\DCR Spa Tower.yaml") -> None:
     setup_logging()
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logger.info("Script execution started: %s", current_time)
-    # Giving the loggers a chance to start before asking for user input
-    time.sleep(1)
+    time.sleep(1)  # Logger delay
 
     # Get username and password (masks password input)
     credentials = get_credentials()
@@ -582,7 +591,7 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(
-        description='Switch Data Retrieval Script')
+        description='Switch MAC Collector Script')
     parser.add_argument(
         'yaml_file',
         type=str,
