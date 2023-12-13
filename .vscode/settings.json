@@ -1,6 +1,5 @@
 {
     // Python configurations
-    "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "basic",
     "python.envFile": "${workspaceFolder}/.venv",
     "python.languageServer": "Pylance",

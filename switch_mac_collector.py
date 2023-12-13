@@ -14,6 +14,7 @@ connection and command execution process, such as authentication errors
 and timeouts.
 
 Modules:
+- argparse: Used for parsing command-line arguments.
 - getpass: Used for reading passwords without echoing characters.
 - logging: Used for logging messages.
 - msvcrt: Used for reading or writing to the console or Windows terminal.
@@ -33,7 +34,9 @@ __author__ = 'Noah Isaac Keller'
 __maintainer__ = 'Noah Isaac Keller'
 __email__ = 'nkeller@choctawnation.com'
 
+import argparse
 import getpass
+import ipaddress
 import logging
 import logging.config
 import msvcrt
@@ -44,20 +47,44 @@ import time
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
-from typing import Optional
+from typing import Any, Dict, List, Optional
 from xml.dom import minidom
 
 import yaml
 from netmiko import (BaseConnection, ConnectHandler,
                      NetMikoAuthenticationException, NetmikoTimeoutException)
+from paramiko.ssh_exception import SSHException
 
 # Global variables
 logger = logging.getLogger(__name__)
 
 
+class ScriptExit(Exception):
+    """Raised when the script exits"""
+    def __init__(self, message, exit_code=1):
+        self.message = message
+        self.exit_code = exit_code
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f'{self.message} (exit code: {self.exit_code})'
+
+
+class InvalidInput(Exception):
+    """Raised when invalid input is provided"""
+    def __init__(self, message, exit_code=2):
+        self.message = message
+        self.exit_code = exit_code
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f'{self.message} (exit code: {self.exit_code})'
+
+
 def create_file_handler(log_file_name: str) -> logging.Handler:
     """
     Creates a file handler for logging.
+
     :param log_file_name: Name of the log file
     :return: File handler
     """
@@ -77,6 +104,7 @@ def create_file_handler(log_file_name: str) -> logging.Handler:
 def create_console_handler() -> logging.Handler:
     """
     Creates a console handler for logging.
+
     :return: Console handler
     """
     console_handler = logging.StreamHandler()
@@ -91,9 +119,10 @@ def setup_logging() -> None:
     """
     Configures logging to save messages to a file and display them on 
     the console.
+
     :return: None
     """
-    log_file_name = f'.\\nmc_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
+    log_file_name = f'.\\smc_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
     file_handler = create_file_handler(log_file_name)
     console_handler = create_console_handler()
 
@@ -106,6 +135,7 @@ def setup_logging() -> None:
 def get_credentials() -> dict:
     """
     Get user credentials: "username" and "password"
+
     :return: Dictionary of user credentials ("username" & "password")
     """
     username = input("Username: ")
@@ -133,62 +163,165 @@ def get_credentials() -> dict:
     return {"username": username, "password": password}
 
 
-def get_devices(inventory: dict, device_filter: str = 'all') -> dict:
+def parse_args() -> argparse.Namespace:
     """
-    Filters devices in the inventory based on a specified filter.
-    :param inventory: Dictionary of devices
-    :param device_filter: Filter string
-    :return: Filtered inventory
+    Parse command-line arguments.
+
+    :return: Parsed arguments
     """
-    device_filter = device_filter.lower()
-    matched_devices = []
-
-    if device_filter != 'all':
-        for device in inventory['hosts']:
-            if (device_filter in device['hostname'].lower() or
-                    device_filter in device['host'].lower()):
-                matched_devices.append(device)
-
-        # Show matched inventory and confirm
-        print_matched_inventory(matched_devices)
-
-    inventory['hosts'] = matched_devices
-    return inventory
+    parser = argparse.ArgumentParser(description='Switch MAC Collector Script')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-f', '--file',
+                        help='Text file containing IP addresses to process')
+    group.add_argument('-i', '--ip',
+                        help='Single IP address to process')
+    group.add_argument('-r', '--ip-range',
+                        help='IP address range (e.g., 10.1.1.0-10.1.1.127)')
+    group.add_argument('-s', '--subnet',
+                        help='Subnet range (e.g., 10.1.1.0/24) to process')
+    return parser.parse_args()
 
 
-def print_matched_inventory(matched_devices: list[dict]) -> None:
+def validate_input(args: argparse.Namespace) -> List[str]:
     """
-    Prints the devices in the matched inventory and prompts for
-    confirmation.
-    :param matched_devices: List of devices that match the specified
-                            criteria
-    :return: None
-    """
-    text = 'Matched inventory'
-    print(f"{text}\n{'*' * len(text)}")
-    for device in matched_devices:
-        print(f"* HOSTNAME: {device['hostname']} - IP: {device['host']}")
+    Validate and process input arguments.
 
-    # Prompt for confirmation with a user-friendly message
-    confirm = input(
-        '\nDo you want to proceed with the selected devices? (yes/no): ')
-    if is_valid_user_input(confirm) and confirm.lower() != 'yes':
-        logger.info("Operation aborted. Exiting the script.")
+    :param args: Parsed command-line arguments
+    :return: List of IP addresses to process
+    """
+    ip_addresses = []
+    if args.file:
+        ip_addresses = process_file(args.file)
+    elif args.ip:
+        ip_addresses = [args.ip]
+    elif args.ip_range:
+        ip_addresses = process_ip_range(args.ip_range)
+    elif args.subnet:
+        ip_addresses = process_subnet(args.subnet)
+
+    if not ip_addresses:
+        raise InvalidInput("No valid IP addresses provided")
+
+    return ip_addresses
+
+
+def process_text_file(file_path: str) -> List[str]:
+    """
+    Processes a text file and returns its contents as a list of IP
+    addresses.
+
+    :param file_path: Path to the text file
+    :return: List of IP addresses
+    """
+    with open(file_path, 'r', encoding="utf-8") as f:
+        ip_addresses = f.read().splitlines()
+    return ip_addresses
+
+
+def process_yaml_file(file_path: str) -> List[str]:
+    """
+    Processes a YAML file and returns its contents.
+
+    :param file_path: Path to the YAML file
+    :return: Contents of the YAML file
+    """
+    with open(file_path, 'r', encoding="utf-8") as f:
+        inventory = yaml.safe_load(f.read())
+    return [host['host'] for host in inventory.get('hosts', [])]
+
+
+def process_file(file_path: str) -> List[str]:
+    """
+    Processes a text file containing IP addresses.
+
+    :param file_path: Path to the text file
+    :return: Dictionary of devices
+    """
+    logger.info("Processing IP addresses from file: %s", file_path)
+    ip_addresses = []
+
+    if file_path.endswith('.txt') or file_path.endswith('.text'):
+        ip_addresses = process_text_file(file_path)
+    elif file_path.endswith('.yml') or file_path.endswith('.yaml'):
+        ip_addresses = process_yaml_file(file_path)
+    else:
+        logger.error("Invalid file type. Exiting the script.")
         safe_exit()
 
+    return ip_addresses
 
-def is_valid_user_input(confirmation: str) -> bool:
+
+def process_subnet(subnet: str) -> List[str]:
     """
-    Validates user input confirmation
-    :param confirmation: user input string to validate
-    :return: True if valid, False otherwise
+    Processes a subnet range and returns a list of IP addresses.
+
+    :param subnet: Subnet range (e.g., 10.1.1.0/24)
+    :return: List of IP addresses
     """
-    return confirmation.lower() in {'yes', 'no'}
+    try:
+        # strict=False allows for a subnet mask to be specified
+        subnet_obj = ipaddress.IPv4Network(subnet, strict=False)
+        return [str(ip) for ip in subnet_obj.hosts()]
+    except ValueError as e:
+        raise InvalidInput("Invalid subnet format") from e
+
+
+def process_ip_range(ip_range: str) -> List[str]:
+    """
+    Processes an IP range and returns a list of IP addresses.
+    
+    :param ip_range: IP address range (e.g., 10.1.1.0-10.1.1.127)
+    :return: List of IP addresses
+    """
+    try:
+        start_ip, end_ip = ip_range.split('-')
+        start_ip_obj = ipaddress.IPv4Address(start_ip.strip())
+        end_ip_obj = ipaddress.IPv4Address(end_ip.strip())
+        return [str(ip) for ip in
+                ipaddress.summarize_address_range(start_ip_obj, end_ip_obj)]
+    except ValueError as e:
+        raise InvalidInput("Invalid IP range format") from e
+
+
+def create_device_dict(
+        ip_address: str,
+        credentials: Dict[str, str]
+    ) -> Dict[str, Any]:
+    """
+    Creates a dictionary representing a device for Netmiko.
+    
+    :param ip_address: IP address of the device
+    :param credentials: Dictionary of user credentials
+                        ("username" & "password")
+    :return: Dictionary representing the device
+    """
+    return {
+        "device_type": "cisco_ios",
+        "ip": ip_address,
+        "username": credentials['username'],
+        "password": credentials['password'],
+        "timeout": 10,
+    }
+
+
+def get_hostname(ssh: BaseConnection) -> str:
+    """
+    Retrieves the hostname of the network device.
+    :param ssh: SSH object representing the connected device
+    :return: Hostname of the device
+    """
+    try:
+        hostname = ssh.find_prompt()
+        return hostname.strip()
+    except SSHException as e:
+        logger.warning("Failed to retrieve the hostname: %s", e)
+        return "Unknown"
 
 
 def extract_voip_vlans(vlan_data: list[dict]) -> list[int]:
     """
     Extracts VLANs with names containing 'VOIP' from VLAN data.
+
     :param vlan_data: VLAN brief data
     :return: List of VOIP VLAN IDs
     """
@@ -210,6 +343,7 @@ def extract_voip_vlans(vlan_data: list[dict]) -> list[int]:
 def extract_ap_vlans(vlan_data: list[dict]) -> list[int]:
     """
     Extracts VLANs with names containing 'AP' or 'Access' from VLAN data.
+
     :param vlan_data: VLAN brief data
     :return: List of AP VLAN IDs
     """
@@ -231,6 +365,7 @@ def extract_ap_vlans(vlan_data: list[dict]) -> list[int]:
 def is_valid_vlan_id(vlan_id: str) -> bool:
     """
     Validates a VLAN ID.
+
     :param vlan_id: VLAN ID to validate
     :return: True if valid, False otherwise
     """
@@ -240,6 +375,7 @@ def is_valid_vlan_id(vlan_id: str) -> bool:
 def extract_mac_addresses(mac_address_table: list[dict]) -> set[str]:
     """
     Extracts MAC addresses from the MAC address table.
+
     :param mac_address_table: MAC address table data
     :return: Set of MAC addresses
     """
@@ -255,8 +391,7 @@ def extract_mac_addresses(mac_address_table: list[dict]) -> set[str]:
 
         for interface in interfaces:
             if (interface and not po_pattern.match(interface) and
-                    mac_address and
-                    is_valid_mac(mac_address)):
+                    mac_address and is_valid_mac(mac_address)):
                 log_discovered_mac(mac_address, interface)
                 mac_addresses.add(mac_address)
 
@@ -266,6 +401,7 @@ def extract_mac_addresses(mac_address_table: list[dict]) -> set[str]:
 def is_valid_mac(mac_address: str) -> bool:
     """
     Validates a MAC address.
+
     :param mac_address: MAC address to validate
     :return: True if valid, False otherwise
     """
@@ -276,6 +412,7 @@ def is_valid_mac(mac_address: str) -> bool:
 def log_discovered_mac(mac_address: str, port: str) -> None:
     """
     Logs the discovery of a MAC address on a specific port.
+
     :param mac_address: Discovered MAC address
     :param port: Port where the MAC address is discovered
     :return: None
@@ -283,34 +420,35 @@ def log_discovered_mac(mac_address: str, port: str) -> None:
     logger.info("\tDiscovered %s on %s", mac_address, port)
 
 
-def export_xml(mac_address_set: set[str], input_file_name: str) -> None:
+def export_xml(mac_address_set: set[str]) -> None:
     """
     Exports MAC addresses to an XML file for ClearPass integration.
+
     :param mac_address_set: Set of MAC addresses
     :param input_file_name: Input file name
     :return: None
     """
-    base_file_name = os.path.splitext(os.path.basename(input_file_name))[0]
-    root = create_xml_structure(mac_address_set, base_file_name)
+    root = create_xml_structure(mac_address_set)
 
     # Debug: Print the generated XML structure
     xml_string_debug = ET.tostring(root, encoding="UTF-8").decode("utf-8")
     logger.debug('Generated XML structure:\n%s', xml_string_debug)
 
     xml_string = create_formatted_xml(root)
-    save_formatted_xml(xml_string, base_file_name)
+    save_formatted_xml(xml_string)
 
 
-def create_xml_structure(
-        mac_address_set: set[str],
-        base_file_name: str
-    ) -> ET.Element:
+def create_xml_structure(mac_address_set: set[str]) -> ET.Element:
     """
     Creates the XML structure for exporting MAC addresses.
+
     :param mac_address_set: Set of MAC addresses
     :param base_file_name: Base file name
     :return: Root element of the XML
     """
+    static_host_list_name = input('\n\nSpecify static host list name: ')
+    static_host_list_desc = input('Specify static host list description: ')
+
     root = ET.Element(
         "TipsContents", xmlns="http://www.avendasys.com/tipsapiDefs/1.0")
 
@@ -324,8 +462,8 @@ def create_xml_structure(
     static_host_list = ET.SubElement(
         static_host_lists,
         "StaticHostList",
-        description=f'{base_file_name[4::]} Hotel APs and Phones',
-        name=f'{base_file_name}',
+        description=static_host_list_desc,
+        name=static_host_list_name,
         memberType="MACAddress",
         memberFormat="list")
     members = ET.SubElement(static_host_list, "Members")
@@ -339,6 +477,7 @@ def create_xml_structure(
 def create_member_element(members: ET.Element, mac_address: str) -> None:
     """
     Creates a member element in the XML structure.
+
     :param members: Members element in the XML
     :param mac_address: MAC address to add as a member
     :return: None
@@ -347,12 +486,14 @@ def create_member_element(members: ET.Element, mac_address: str) -> None:
         members,
         "Member",
         description=mac_address.replace(".", ""),
-        address=mac_address.upper())
+        address=mac_address.upper()
+    )
 
 
 def create_formatted_xml(root: ET.Element) -> str:
     """
     Creates formatted XML from the XML structure.
+
     :param root: Root element of the XML
     :return: Formatted XML string
     """
@@ -363,17 +504,17 @@ def create_formatted_xml(root: ET.Element) -> str:
     return dom.toprettyxml(encoding="UTF-8").decode()
 
 
-def save_formatted_xml(xml_string: str, base_file_name: str) -> None:
+def save_formatted_xml(xml_string: str) -> None:
     """
     Saves the formatted XML to a file.
+
     :param xml_string: Formatted XML string
     :param base_file_name: Base file name
     :return: None
     """
     # Debug: Print the XML string before writing to the file
     logger.debug('Saving XML to file:\n%s', xml_string)
-    output_file_name = f'{os.path.expanduser('~\\Downloads')}\\{
-        base_file_name}.xml'
+    output_file_name = f'.\\smc_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xml'
     with open(output_file_name, 'wb') as xml_file:
         xml_file.write(xml_string.encode())
 
@@ -381,6 +522,7 @@ def save_formatted_xml(xml_string: str, base_file_name: str) -> None:
 def export_txt(mac_address_set: set[str], input_file_name: str) -> None:
     """
     Exports MAC addresses to a text file.
+
     :param mac_address_set: Set of MAC addresses
     :param input_file_name: Input file name
     :return: None
@@ -394,15 +536,16 @@ def export_txt(mac_address_set: set[str], input_file_name: str) -> None:
 
 def safe_exit(
         script_start_timer: Optional[float] = None,
-        device_counter: Optional[int] = None
+        device_counter: int = 0
     ) -> None:
     """
     Ensures a safe exit; close and flush loggers then system exit
+
     :param script_start_timer: Start timer of the script
     :param device_counter: Count of devices that the script ran commands on
     :return: None
     """
-    if script_start_timer and device_counter:
+    if script_start_timer and device_counter != 0:
         # Get and log finishing time
         script_elapsed_time = time.perf_counter() - script_start_timer
         logger.info('The script required %0.2f seconds to finish processing on'
@@ -412,85 +555,101 @@ def safe_exit(
                      datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
     # Safe close the loggers
-    logging.getLogger().handlers[0].flush()
-    logging.getLogger().handlers[0].close()
+    logger.handlers[0].flush()
+    logger.handlers[0].close()
 
     sys.exit()
 
 
-def connect_to_device(device: dict, hostname: str) -> BaseConnection:
+def connect_to_device(device: Dict[str, Any]) -> BaseConnection:
     """
-    Connects to a network device using SSH.
-    :param hostname: Hostname of the device
-    :param device: Dictionary representing the device to connect to
-    :return: SSH object
+    Establishes an SSH connection to a network device.
+
+    :param device: Dictionary representing the device
+    :return: SSH connection
     """
-    logger.info("===> Connecting to %s (%s)", hostname, device['host'])
-    ssh = ConnectHandler(**device)
-    ssh.enable()
-    logger.info("<=== Received %s (%s)", hostname, device['host'])
-    return ssh
+    logger.info("===> Connecting to %s", device['ip'])
+    try:
+        ssh = ConnectHandler(**device)
+        ssh.enable()
+        logger.info("<=== Received %s", device['ip'])
+        return ssh
+    except Exception as e:
+        raise ScriptExit(f"Failed to connect to the device: {e}") from e
 
 
-def process_devices(devices: dict, credentials: dict) -> set[str]:
+def process_ip_addresses(
+        ip_addresses: List[str],
+        credentials: Dict[str, str]
+) -> Dict[str, Any]:
     """
-    Processes commands on devices to find MAC addresses.
-    :param devices: Dictionary of devices to connect to
-    :param credentials: Dictionary of user credentials
-                        ("username" & "password")
-    :return: Set of MAC addresses
+    Processes devices to find MAC addresses.
+
+    :param ip_addresses: List of IP addresses to process
+    :param credentials: Dictionary with 'username' and 'password'
+    :return: Dictionary with 'mac_addresses' and 'failed_devices'
     """
     mac_addresses = set()
+    failed_devices = []
 
-    for device in devices['hosts']:
-        device.update(devices['common_vars'])
-        device.update(credentials)
-
-        ssh: Optional[BaseConnection] = None
-        hostname = None
+    for ip_address in ip_addresses:
         try:
-            # Assign a value to the hostname variable
-            hostname = device['hostname']
-            del device['hostname']
+            mac_addresses.update(process_device(ip_address, credentials))
+        except ScriptExit as e:
+            logger.error("Failed to process %s: %s", ip_address, e)
+            failed_devices.append(ip_address)
 
-            ssh = connect_to_device(device, hostname)
-            process_device_data(ssh, mac_addresses)
-        except (NetmikoTimeoutException, NetMikoAuthenticationException) as e:
-            logger.error("Error: %s", str(e))
-        finally:
-            if (ssh and isinstance(ssh, BaseConnection) and
-                    hostname is not None):
-                ssh.disconnect()
-                logger.info("Disconnected from %s (%s)",
-                             hostname, device['host'])
-
-    return mac_addresses
+    return {"mac_addresses": mac_addresses, "failed_devices": failed_devices}
 
 
-def process_device_data(ssh: BaseConnection, mac_addresses: set[str]) -> None:
+def process_device(ip_address: str, credentials: Dict[str, str]) -> set[str]:
+    """
+    Processes a single device to find MAC addresses.
+
+    :param ip_address: IP address of the device
+    :param credentials: Dictionary with 'username' and 'password'
+    :return: List of MAC addresses found on the device
+    """
+    try:
+        device = create_device_dict(ip_address, credentials)
+        with connect_to_device(device) as ssh:
+            hostname = get_hostname(ssh)
+            mac_addresses = process_device_data(ssh, hostname)
+            return mac_addresses
+    except NetMikoAuthenticationException as e:
+        raise ScriptExit("Authentication failed") from e
+    except NetmikoTimeoutException as e:
+        raise ScriptExit("Connection timed out") from e
+
+
+def process_device_data(ssh: BaseConnection, hostname: str) -> set[str]:
     """
     Processes data on a network device to find MAC addresses.
+
     :param ssh: SSH object representing the connected device
     :param mac_addresses: Set of MAC addresses
     :return: None
     """
-    logger.info("Processing data on the network device ...")
+    logger.info("Processing data on %s ...", hostname)
 
     vlan_output = get_vlan_output(ssh)
     voip_vlans = extract_voip_vlans(vlan_output)
     ap_vlans = extract_ap_vlans(vlan_output)
 
+    mac_addresses = set()
     for vlan_id in (voip_vlans + ap_vlans):
         mac_address_table = get_mac_address_table(ssh, vlan_id)
         extracted_mac_address = extract_mac_addresses(mac_address_table)
         mac_addresses.update(extracted_mac_address)
 
-    logger.info("... Finished processing data on the network device.")
+    logger.info("... Finished processing data on %s", hostname)
+    return mac_addresses
 
 
 def get_vlan_output(ssh: BaseConnection) -> list[dict]:
     """
     Retrieves VLAN data from a network device.
+
     :param ssh: SSH object representing the connected device
     :return: List of VLAN data
     """
@@ -502,6 +661,7 @@ def get_mac_address_table(ssh: BaseConnection, vlan_id: int) -> list[dict]:
     """
     Retrieves MAC address table data for a specific VLAN from a network
     device.
+
     :param ssh: SSH object representing the connected device
     :param vlan_id: VLAN ID to query
     :return: List of MAC address table data
@@ -513,6 +673,7 @@ def get_mac_address_table(ssh: BaseConnection, vlan_id: int) -> list[dict]:
 def send_command(ssh: BaseConnection, command: str) -> list[dict]:
     """
     Sends a command to a network device and returns the output.
+
     :param ssh: SSH object representing the connected device
     :param command: Command to send
     :return: Output of the command
@@ -523,7 +684,7 @@ def send_command(ssh: BaseConnection, command: str) -> list[dict]:
     elapsed_time = time.perf_counter() - execution_start_timer
     logger.debug('Command "%s" executed in %0.2f seconds.',
                   command, elapsed_time)
-    
+
     if isinstance(output, dict):
         # Handle the case where the output is a dictionary
         output = [output]
@@ -541,6 +702,7 @@ def disconnect_from_device(
     ) -> None:
     """
     Disconnects from a network device.
+
     :param hostname: Hostname of the device
     :param ssh: SSH object representing the connected device
     :param device: Dictionary representing the device
@@ -548,55 +710,42 @@ def disconnect_from_device(
     """
     if ssh:
         ssh.disconnect()
-        logger.info("Disconnected from %s (%s)", hostname, device['host'])
+        logger.info("Disconnected from %s (%s)", hostname, device['ip'])
 
 
-def main(yaml_file: str  = ".\\DCR Spa Tower.yaml") -> None:
-    """
-    Main function to execute the script.
-    
-    :param yaml_file: YAML file containing network device inventory
-    :type yaml_file: str
-    :return: None
-    """
+def main() -> None:
+    """Main function"""
     setup_logging()
+    args = parse_args()
+
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     logger.info("Script execution started: %s", current_time)
     time.sleep(1)  # Logger delay
 
-    # Get username and password (masks password input)
-    credentials = get_credentials()
-
-    # Read the YAML file and find inventory to run commands on
-    # yaml_file = 'DCR Spa Tower.yaml'
-    with open(yaml_file, encoding="utf-8") as f:
-        inventory = yaml.safe_load(f.read())
-    dev_filter = input('\n\nSpecify device filter: ')
-    devices = get_devices(inventory, dev_filter)
-    device_counter = len(devices['hosts'])
-
     # Find the MAC addresses of the devices we are looking for
     script_start_timer = time.perf_counter()
-    mac_addresses = process_devices(devices, credentials)
+    ip_addresses = []
+    try:
+        ip_addresses = validate_input(args)
+        credentials = get_credentials()
+        result = process_ip_addresses(ip_addresses, credentials)
 
-    # Export the MAC addresses into an XML file for ClearPass to import
-    export_xml(mac_addresses, yaml_file)
-    # export_txt(mac_addresses, yaml_file)
+        if result['mac_addresses']:
+            logger.info("MAC addresses found: %s", result['mac_addresses'])
+            export_xml(result['mac_addresses'])
 
-    # Script completion into a safe exit
-    safe_exit(script_start_timer, device_counter)
+        if result["failed_devices"]:
+            logger.warning("Failed to process devices: %s",
+                           {', '.join(result['failed_devices'])})
+    except InvalidInput as e:
+        logger.error("Invalid input: %s", e)
+    except ScriptExit as e:
+        logger.error("Script exited: %s", e)
+    except KeyboardInterrupt:
+        logger.error("Keyboard interrupt detected. Exiting the script.")
+    finally:
+        safe_exit(script_start_timer, len(ip_addresses))
 
 
 if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description='Switch MAC Collector Script')
-    parser.add_argument(
-        'yaml_file',
-        type=str,
-        help='YAML file containing network device inventory'
-    )
-    args = parser.parse_args()
-
-    main(args.yaml_file)
+    main()
