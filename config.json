@@ -1,0 +1,7 @@
+{
+    "log_file_path": "./logs/switch_collector.log",
+    "logging_level": "INFO",
+    "max_threads": 5,
+    "retry_attempts": 3,
+    "retry_delay": 5
+}
