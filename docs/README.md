@@ -122,49 +122,49 @@ The collected MAC addresses are exported to an XML file in a specific format tha
 python switch_mac_collector.py -i 192.168.1.1
 ```
 
-![Single IP Address](docs\images\single_ip_example.jpg)
+![Single IP Address](images\single_ip_example.jpg)
 
 ```bash
 # Process an IP Range:
 python switch_mac_collector.py -r 10.1.1.10-10.1.1.20
 ```
 
-![IP Range](docs\images\ip_range_example.jpg)
+![IP Range](images\ip_range_example.jpg)
 
 ```bash
 # Process a Subnet:
 python switch_mac_collector.py -s 192.168.0.0/24
 ```
 
-![Subnet](docs\images\subnet_example.jpg)
+![Subnet](images\subnet_example.jpg)
 
 ```bash
 # Process IP Addresses from a Text File and log to a custom Log File:
 python switch_mac_collector.py -f ip_list.txt --log-file-path custom_log_file_path.log
 ```
 
-![Text File & Log Path](docs\images\text_file_and_log_path_change.jpg)
+![Text File & Log Path](images\text_file_and_log_path_change.jpg)
 
 ```bash
 # Change the Console Handler (prints to screen) Log Level to DEBUG
 python switch_mac_collector.py -f ip_list.txt --log-level DEBUG
 ```
 
-![Text File & Log Level](docs\images\text_file_and_log_level_change.jpg)
+![Text File & Log Level](images\text_file_and_log_level_change.jpg)
 
 ```bash
 # Process IP Addresses from a YAML File:
 python switch_mac_collector.py -f ip_list.yml
 ```
 
-![Yaml File](docs\images\yml_file_example.jpg)
+![Yaml File](images\yml_file_example.jpg)
 
 ```bash
 # Process IP Addresses from an Enhanced YAML File:
 python switch_mac_collector.py -f ip_list.yaml
 ```
 
-![Enhanced Yaml File](docs\images\enhanced_yaml_file_example.jpg)
+![Enhanced Yaml File](images\enhanced_yaml_file_example.jpg)
 
 ## File Format Examples
 
