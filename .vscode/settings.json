@@ -1,6 +1,5 @@
 {
     // Python configurations
-    "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "basic",
     "python.envFile": "${workspaceFolder}/.venv",
     "python.languageServer": "Pylance",
@@ -10,7 +9,7 @@
     "editor.defaultFormatter": "ms-python.pylint",
     // 72: Comments & Docstrings
     // 79: PEP8, all other lines
-    "editor.rulers": [72, 79],
+    "editor.rulers": [72, 80],
     "editor.codeActionsOnSave": {
         "source.organizeImports": "explicit"
     },
