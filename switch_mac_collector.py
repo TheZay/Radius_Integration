@@ -25,11 +25,11 @@ command-line help:
 
 Usage:
   python switch_mac_collector.py [
-    -f FILE |
-    -i IP |
-    -r IP_RANGE |
-    -s SUBNET |
-    --log-file-path LOG_FILE_PATH |
+    -f FILE
+    -i IP
+    -r IP_RANGE
+    -s SUBNET
+    --log-file-path LOG_FILE_PATH
     --log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
   ]
 
@@ -78,8 +78,8 @@ from typing import List, Optional
 from xml.dom import minidom
 
 import yaml
-from netmiko import (BaseConnection, ConnectHandler,
-                     NetmikoAuthenticationException, NetmikoTimeoutException)
+from netmiko import (ConnectHandler, NetmikoAuthenticationException,
+                     NetmikoTimeoutException)
 from paramiko.ssh_exception import SSHException
 
 # Global variables
@@ -128,6 +128,9 @@ def setup_logging(log_file_path: str, log_level: str) -> None:
 
     LOGGER.setLevel(log_level.upper())
 
+    if log_level != 'INFO':
+        LOGGER.log(logging.INFO, 'Log level set to %s', log_level)
+
 
 def create_file_handler(log_file_name: str) -> logging.Handler:
     """
@@ -147,8 +150,8 @@ def create_file_handler(log_file_name: str) -> logging.Handler:
     )
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(logging.Formatter(
-        '[%(asctime)s][%(levelname)s][%(process)d] %(message)s',
-        datefmt='%H:%M:%S'
+        '[%(levelname)-5s][%(asctime)s][%(process)d] %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
     ))
     return file_handler
 
@@ -161,11 +164,25 @@ def create_console_handler() -> logging.Handler:
         logging.Handler: The console handler object.
     """
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
+    # console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(logging.Formatter(
-        '[%(levelname)s] %(message)s',
-        datefmt='%H:%M:%S'))
+        '[%(levelname)-5s] %(message)s'))
     return console_handler
+
+
+def add_separator_to_log(log_file_path: str, separator: str = '-' * 80):
+    """
+    Add a separator to the end of the log file.
+
+    Args:
+        log_file_path (str): The path to the log file.
+        separator (str): The separator string to add.
+
+    Returns:
+        None
+    """
+    with open(log_file_path, 'a', encoding="utf-8") as log_file:
+        log_file.write(separator + '\n')
 
 
 # ----------------------------------------------------------------------
@@ -182,23 +199,28 @@ def parse_args(config: dict) -> argparse.Namespace:
         argparse.Namespace: Parsed command line arguments.
     """
     parser = argparse.ArgumentParser(description='Switch MAC Collector Script')
+
+    # Required arguments
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-f', '--file',
                        help='Text file containing IP addresses to process')
     group.add_argument('-i', '--ip',
                        help='Single IP address to process')
-    group.add_argument('--log-file-path',
-                       default=config['log_file_path'],
-                       help='Log file path (default: %(default)s)')
-    group.add_argument('--log-level',
-                       choices=['DEBUG', 'INFO',
-                                'WARNING', 'ERROR', 'CRITICAL'],
-                       default=config['logging_level'],
-                       help='Log level (default: %(default)s)')
     group.add_argument('-r', '--ip-range',
                        help='IP address range (e.g., 10.1.1.0-10.1.1.127)')
     group.add_argument('-s', '--subnet',
                        help='Subnet range (e.g., 10.1.1.0/24) to process')
+
+    # Optional arguments
+    parser.add_argument('--log-file-path',
+                        default=config['log_file_path'],
+                        help='Log file path (default: %(default)s)')
+    parser.add_argument('--log-level',
+                       choices=['DEBUG', 'INFO',
+                                'WARNING', 'ERROR', 'CRITICAL'],
+                       default=config['logging_level'],
+                       help='Log level (default: %(default)s)')
+
     return parser.parse_args()
 
 
@@ -218,19 +240,19 @@ class DeviceManager:
                                     that failed during processing.
 
     Methods:
-        __init__(self, credentials, device_list): Initializes a
-                                                  DeviceManager object.
-        process_all_devices(self): Processes all devices in the
-                                   collection.
-        process_device(self, device): Processes a network device to
-                                      collect MAC addresses
+        __init__(self, credentials, device_list) -> None:
+            Initializes a DeviceManager object.
+        process_all_devices(self) -> None:
+            Processes all devices in the collection.
+        process_device(self, device) -> None:
+            Processes a network device to collect MAC addresses
         extract_mac_addresses(self, mac_address_table: list[dict])
             -> set[str]: Extracts valid MAC addresses from a given MAC
                          address table.
         is_valid_mac_address(self, mac_address: str) -> bool:
             Checks if a given string is a valid MAC address.
     """
-    def __init__(self, credentials, device_list):
+    def __init__(self, credentials, device_list) -> None:
         """
         Initializes the SwitchMacCollector object.
 
@@ -245,7 +267,7 @@ class DeviceManager:
         self.mac_addresses = set()
         self.failed_devices = []
 
-    def process_all_devices(self):
+    def process_all_devices(self) -> None:
         """
         Process all devices in the collection.
 
@@ -257,16 +279,12 @@ class DeviceManager:
 
         """
         for device in self.devices:
-            try:
-                device.connect()
-                self.process_device(device)
-                device.disconnect()
-            # TODO: Add more specific exception handling
-            except Exception as e:
-                LOGGER.error("Error processing %s: %s", device.ip_address, e)
-                self.failed_devices.append(device.ip_address)
+            device.connect()
+            self.process_device(device)
+            device.disconnect()
 
-    def process_device(self, device):
+
+    def process_device(self, device) -> None:
         """
         Process a network device to collect MAC addresses.
 
@@ -279,12 +297,12 @@ class DeviceManager:
         LOGGER.info("Processing %s (%s)", device.hostname, device.ip_address)
 
         vlan_brief = device.execute_command('show vlan brief')
-        device.voip_vlans = device.extract_voip_vlans(vlan_brief)
-        device.ap_vlans = device.extract_ap_vlans(vlan_brief)
+        device.extract_voip_vlans(vlan_brief)
+        device.extract_ap_vlans(vlan_brief)
 
         for vlan_id in (device.voip_vlans + device.ap_vlans):
             mac_address_table = device.execute_command(
-                                    f'show mac address-tablevlan {vlan_id}')
+                                    f'show mac address-table vlan {vlan_id}')
             extracted_mac_addresses = self.extract_mac_addresses(
                                         mac_address_table)
             self.mac_addresses.update(extracted_mac_addresses)
@@ -359,11 +377,11 @@ class NetworkDevice:
         ap_vlans (list[int]): A list of VLAN IDs for AP VLANs.
 
     Methods:
-        __init__(self, ip_address, credentials): Initializes a
-                                                 NetworkDevice object.
-        connect(self): Connects to the device using the provided
-                       credentials and device type.
-        disconnect(self): Disconnects from the switch.
+        __init__(self, ip_address, credentials) -> None:
+            Initializes a NetworkDevice object.
+        connect(self) -> None: Connects to the device using the provided
+                               credentials and device type.
+        disconnect(self) -> None: Disconnects from the switch.
         execute_command(self, command, fsm=True) -> list[dict]:
             Executes a command on the device and returns the output.
         extract_voip_vlans(self, vlan_data) -> None:
@@ -373,7 +391,7 @@ class NetworkDevice:
         is_valid_vlan_id(self, vlan_id) -> bool:
             Check if the given VLAN ID is valid.
     """
-    def __init__(self, ip_address: str, credentials: dict):
+    def __init__(self, ip_address: str, credentials: dict) -> None:
         """
         Initializes a NetworkDevice object.
 
@@ -385,12 +403,12 @@ class NetworkDevice:
         self.ip_address = ip_address
         self.credentials = credentials
         self.device_type = 'cisco_ios'
-        self.connection = BaseConnection()
+        self.connection = None
         self.hostname = "Unknown"
-        self.voip_vlans = list[int]
-        self.ap_vlans = list[int]
+        self.voip_vlans = []
+        self.ap_vlans = []
 
-    def connect(self):
+    def connect(self) -> None:
         """
         Connects to the device using the provided credentials and device
             type.
@@ -424,7 +442,8 @@ class NetworkDevice:
             LOGGER.error("Failed to retrieve the hostname for %s: %s",
                             self.ip_address, e)
 
-    def disconnect(self):
+
+    def disconnect(self) -> None:
         """
         Disconnects from the switch.
 
@@ -456,10 +475,9 @@ class NetworkDevice:
         execution_time = time.perf_counter()
         try:
             output = self.connection.send_command(command, use_textfsm=fsm)
-        # TODO: Add more specific exception handling
-        except Exception as e:
-            LOGGER.error("Error executing command on %s: %s",
-                         self.ip_address, e)
+        except InvalidInput as e:
+            LOGGER.error("Error executing %s on %s: %s",
+                         command, self.ip_address, e)
             output = [{'Error': e}]
         finally:
             elapsed_time = time.perf_counter() - execution_time
@@ -475,7 +493,7 @@ class NetworkDevice:
 
         return output
 
-    def extract_voip_vlans(self, vlan_data: list[dict]):
+    def extract_voip_vlans(self, vlan_data: list[dict]) -> None:
         """
         Extracts the VLAN IDs of VoIP VLANs from the given VLAN data.
 
@@ -487,19 +505,18 @@ class NetworkDevice:
             None
 
         """
-        self.voip_vlans = [
-            int(vlan_info['vlan_id'])
-            for vlan_info in vlan_data
+        for vlan_info in vlan_data:
             if (
                 'vlan_name' in vlan_info and
-                re.search(r'(?i)voip', vlan_info['vlan_name']) and
+                re.search(r'(?i)voip|voice\s*', vlan_info['vlan_name']) and
                 vlan_info['interfaces'] and
                 self.is_valid_vlan_id(vlan_info['vlan_id'])
-            )
-        ]
-        LOGGER.debug("Found VoIP VLANs: %s", self.voip_vlans)
+            ):
+                self.voip_vlans.append(int(vlan_info['vlan_id']))
 
-    def extract_ap_vlans(self, vlan_data: list[dict]):
+        LOGGER.debug("Discovered VoIP VLANs: %s", self.voip_vlans)
+
+    def extract_ap_vlans(self, vlan_data: list[dict]) -> None:
         """
         Extracts the VLAN IDs of AP VLANs from the given VLAN data.
 
@@ -511,17 +528,16 @@ class NetworkDevice:
             None
 
         """
-        self.ap_vlans = [
-            int(vlan_info['vlan_id'])
-            for vlan_info in vlan_data
+        for vlan_info in vlan_data:
             if (
                 'vlan_name' in vlan_info and
                 re.search(r'(?i)ap|access\s*', vlan_info['vlan_name']) and
                 vlan_info['interfaces'] and
                 self.is_valid_vlan_id(vlan_info['vlan_id'])
-            )
-        ]
-        LOGGER.debug("Found AP VLANs: %s", self.ap_vlans)
+            ):
+                self.ap_vlans.append(int(vlan_info['vlan_id']))
+
+        LOGGER.debug("Discovered AP VLANs: %s", self.ap_vlans)
 
     @staticmethod
     def is_valid_vlan_id(vlan_id: str) -> bool:
@@ -631,6 +647,7 @@ def get_credentials() -> dict:
                          " falling back to getpass.")
         password = getpass.getpass()
     finally:
+        print()
         LOGGER.debug("Password entered.")
 
     return {"username": username, "password": password}
@@ -663,7 +680,31 @@ def process_yaml_file(file_path: str) -> List[str]:
     """
     with open(file_path, 'r', encoding="utf-8") as f:
         inventory = yaml.safe_load(f.read())
-    return [host['host'] for host in inventory.get('hosts', [])]
+
+    ip_addresses = []
+    for host in inventory.get('hosts', []):
+        if host.get('host') and is_valid_ip_address(host['host']):
+            ip_addresses.append(host['host'])
+        elif host.get('ip') and is_valid_ip_address(host['ip']):
+            ip_addresses.append(host['ip'])
+    return ip_addresses
+
+
+def is_valid_ip_address(ip_address: str) -> bool:
+    """
+    Check if a given string is a valid IP address.
+
+    Args:
+        ip_address (str): The string to be checked.
+
+    Returns:
+        bool: True if the string is a valid IP address, False otherwise.
+    """
+    try:
+        ipaddress.IPv4Address(ip_address)
+        return True
+    except ValueError:
+        return False
 
 
 def process_file(file_path: str) -> List[str]:
@@ -726,10 +767,10 @@ def process_ip_range(ip_range: str) -> List[str]:
     """
     try:
         start_ip, end_ip = ip_range.split('-')
-        start_ip_obj = ipaddress.IPv4Address(start_ip.strip())
-        end_ip_obj = ipaddress.IPv4Address(end_ip.strip())
-        return [str(ip) for ip in
-                ipaddress.summarize_address_range(start_ip_obj, end_ip_obj)]
+        start_ip_obj = int(ipaddress.IPv4Address(start_ip.strip()))
+        end_ip_obj = int(ipaddress.IPv4Address(end_ip.strip()))
+        return [str(ipaddress.IPv4Address(ip))
+                for ip in range(start_ip_obj, end_ip_obj + 1)]
     except ValueError as e:
         raise InvalidInput("Invalid IP range format") from e
 
@@ -745,10 +786,7 @@ def export_xml(mac_address_set: set[str]) -> None:
         None
     """
     root = create_xml_structure(mac_address_set)
-
-    # Debug: Print the generated XML structure
-    xml_string_debug = ET.tostring(root, encoding="UTF-8").decode("utf-8")
-    LOGGER.debug('Generated XML structure:\n%s', xml_string_debug)
+    LOGGER.debug('Generated XML structure')
 
     xml_string = create_formatted_xml(root)
     save_formatted_xml(xml_string)
@@ -764,8 +802,12 @@ def create_xml_structure(mac_address_set: set[str]) -> ET.Element:
     Returns:
         ET.Element: The root element of the XML structure.
     """
-    static_host_list_name = input('\n\nSpecify static host list name: ')
+    LOGGER.info("Creating XML structure for %d MAC addresses.",
+                len(mac_address_set))
+    static_host_list_name = input('Specify static host list name: ')
+    LOGGER.debug('Static host list name: %s', static_host_list_name)
     static_host_list_desc = input('Specify static host list description: ')
+    LOGGER.debug('Static host list description: %s', static_host_list_desc)
 
     root = ET.Element(
         "TipsContents", xmlns="http://www.avendasys.com/tipsapiDefs/1.0")
@@ -841,7 +883,7 @@ def save_formatted_xml(xml_string: str) -> None:
         None
     """
     # Debug: Print the XML string before writing to the file
-    LOGGER.debug('Saving XML to file:\n%s', xml_string)
+    LOGGER.debug('Saving XML to file')
     output_file_name = f'.\\smc_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xml'
     with open(output_file_name, 'wb') as xml_file:
         xml_file.write(xml_string.encode())
@@ -867,7 +909,8 @@ def export_txt(mac_address_set: set[str], input_file_name: str) -> None:
 
 def safe_exit(
         script_start_timer: Optional[float] = None,
-        device_counter: int = 0
+        device_counter: int = 0,
+        log_file_path: str = '.\\logs\\config.json'
 ) -> None:
     """
     Safely exits the script and logs the finishing time and script
@@ -890,6 +933,9 @@ def safe_exit(
         LOGGER.info("Script execution completed: %s",
                     datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
+    # Add a separator to the log file
+    add_separator_to_log(log_file_path)
+
     # Safe close the loggers
     LOGGER.handlers[0].flush()
     LOGGER.handlers[0].close()
@@ -911,16 +957,17 @@ def main() -> None:
     """
     config = load_config()
     args = parse_args(config)
-    setup_logging(args.file_path, args.log_level)
+    setup_logging(args.log_file_path, args.log_level)
 
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    LOGGER.info("Script execution started: %s\n", current_time)
-    time.sleep(1)  # LOGGER delay
+    LOGGER.info("Script execution started: %s", current_time)
+    time.sleep(0.25)  # LOGGER delay
 
     script_start_timer = time.perf_counter()
     ip_addresses = []
     try:
         ip_addresses = validate_input(args)
+        LOGGER.info("IP addresses to process: %s", ip_addresses)
         credentials = get_credentials()
         device_manager = DeviceManager(credentials, ip_addresses)
         device_manager.process_all_devices()
@@ -932,7 +979,7 @@ def main() -> None:
     except KeyboardInterrupt:
         LOGGER.error("Keyboard interrupt detected. Exiting the script.")
     finally:
-        safe_exit(script_start_timer, len(ip_addresses))
+        safe_exit(script_start_timer, len(ip_addresses), args.log_file_path)
 
 
 if __name__ == '__main__':
