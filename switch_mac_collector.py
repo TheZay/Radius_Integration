@@ -71,11 +71,11 @@ import os.path
 import re
 import sys
 import time
-import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
 from typing import List, Optional
 from xml.dom import minidom
+from xml.etree.ElementTree import Element, SubElement, tostring
 
 import yaml
 from netmiko import (ConnectHandler, NetmikoAuthenticationException,
@@ -84,6 +84,7 @@ from paramiko.ssh_exception import SSHException
 
 # Global variables
 LOGGER = logging.getLogger(__name__)
+
 
 # ----------------------------------------------------------------------
 #                 Configuration and Logging Setup
@@ -216,10 +217,10 @@ def parse_args(config: dict) -> argparse.Namespace:
                         default=config['log_file_path'],
                         help='Log file path (default: %(default)s)')
     parser.add_argument('--log-level',
-                       choices=['DEBUG', 'INFO',
-                                'WARNING', 'ERROR', 'CRITICAL'],
-                       default=config['logging_level'],
-                       help='Log level (default: %(default)s)')
+                        choices=['DEBUG', 'INFO',
+                                 'WARNING', 'ERROR', 'CRITICAL'],
+                        default=config['logging_level'],
+                        help='Log level (default: %(default)s)')
 
     return parser.parse_args()
 
@@ -252,6 +253,7 @@ class DeviceManager:
         is_valid_mac_address(self, mac_address: str) -> bool:
             Checks if a given string is a valid MAC address.
     """
+
     def __init__(self, credentials, device_list) -> None:
         """
         Initializes the SwitchMacCollector object.
@@ -283,7 +285,6 @@ class DeviceManager:
             self.process_device(device)
             device.disconnect()
 
-
     def process_device(self, device) -> None:
         """
         Process a network device to collect MAC addresses.
@@ -302,9 +303,9 @@ class DeviceManager:
 
         for vlan_id in (device.voip_vlans + device.ap_vlans):
             mac_address_table = device.execute_command(
-                                    f'show mac address-table vlan {vlan_id}')
+                f'show mac address-table vlan {vlan_id}')
             extracted_mac_addresses = self.extract_mac_addresses(
-                                        mac_address_table)
+                mac_address_table)
             self.mac_addresses.update(extracted_mac_addresses)
         LOGGER.info("Finished processing %s (%s)",
                     device.hostname, device.ip_address)
@@ -391,6 +392,7 @@ class NetworkDevice:
         is_valid_vlan_id(self, vlan_id) -> bool:
             Check if the given VLAN ID is valid.
     """
+
     def __init__(self, ip_address: str, credentials: dict) -> None:
         """
         Initializes a NetworkDevice object.
@@ -434,14 +436,13 @@ class NetworkDevice:
             LOGGER.info("Connected to %s (%s)", self.hostname, self.ip_address)
         except NetmikoTimeoutException as e:
             LOGGER.error("Timeout when connecting to %s: %s",
-                            self.ip_address, e)
+                         self.ip_address, e)
         except NetmikoAuthenticationException as e:
             LOGGER.error("Authentication failed when connecting to %s: %s",
-                            self.ip_address, e)
+                         self.ip_address, e)
         except SSHException as e:
             LOGGER.error("Failed to retrieve the hostname for %s: %s",
-                            self.ip_address, e)
-
+                         self.ip_address, e)
 
     def disconnect(self) -> None:
         """
@@ -507,10 +508,10 @@ class NetworkDevice:
         """
         for vlan_info in vlan_data:
             if (
-                'vlan_name' in vlan_info and
-                re.search(r'(?i)voip|voice\s*', vlan_info['vlan_name']) and
-                vlan_info['interfaces'] and
-                self.is_valid_vlan_id(vlan_info['vlan_id'])
+                    'vlan_name' in vlan_info and
+                    re.search(r'(?i)voip|voice\s*', vlan_info['vlan_name']) and
+                    vlan_info['interfaces'] and
+                    self.is_valid_vlan_id(vlan_info['vlan_id'])
             ):
                 self.voip_vlans.append(int(vlan_info['vlan_id']))
 
@@ -530,10 +531,10 @@ class NetworkDevice:
         """
         for vlan_info in vlan_data:
             if (
-                'vlan_name' in vlan_info and
-                re.search(r'(?i)ap|access\s*', vlan_info['vlan_name']) and
-                vlan_info['interfaces'] and
-                self.is_valid_vlan_id(vlan_info['vlan_id'])
+                    'vlan_name' in vlan_info and
+                    re.search(r'(?i)ap|access\s*', vlan_info['vlan_name']) and
+                    vlan_info['interfaces'] and
+                    self.is_valid_vlan_id(vlan_info['vlan_id'])
             ):
                 self.ap_vlans.append(int(vlan_info['vlan_id']))
 
@@ -550,7 +551,7 @@ class NetworkDevice:
         Returns:
             bool: True if the VLAN ID is valid, False otherwise.
         """
-        return vlan_id.isdigit() and int(vlan_id) > 0 and int(vlan_id) < 4095
+        return vlan_id.isdigit() and 0 < int(vlan_id) < 4095
 
 
 class ScriptExit(Exception):
@@ -792,7 +793,7 @@ def export_xml(mac_address_set: set[str]) -> None:
     save_formatted_xml(xml_string)
 
 
-def create_xml_structure(mac_address_set: set[str]) -> ET.Element:
+def create_xml_structure(mac_address_set: set[str]) -> Element:
     """
     Creates an XML structure for a given set of MAC addresses.
 
@@ -809,24 +810,24 @@ def create_xml_structure(mac_address_set: set[str]) -> ET.Element:
     static_host_list_desc = input('Specify static host list description: ')
     LOGGER.debug('Static host list description: %s', static_host_list_desc)
 
-    root = ET.Element(
+    root = Element(
         "TipsContents", xmlns="http://www.avendasys.com/tipsapiDefs/1.0")
 
-    ET.SubElement(
+    SubElement(
         root,
         "TipsHeader",
         exportTime=datetime.now(timezone.utc).strftime(
             "%a %b %d %H:%M:%S UTC %Y"),
         version="6.11")
-    static_host_lists = ET.SubElement(root, "StaticHostLists")
-    static_host_list = ET.SubElement(
+    static_host_lists = SubElement(root, "StaticHostLists")
+    static_host_list = SubElement(
         static_host_lists,
         "StaticHostList",
         description=static_host_list_desc,
         name=static_host_list_name,
         memberType="MACAddress",
         memberFormat="list")
-    members = ET.SubElement(static_host_list, "Members")
+    members = SubElement(static_host_list, "Members")
 
     for mac_address in mac_address_set:
         create_member_element(members, mac_address)
@@ -834,9 +835,9 @@ def create_xml_structure(mac_address_set: set[str]) -> ET.Element:
     return root
 
 
-def create_member_element(members: ET.Element, mac_address: str) -> None:
+def create_member_element(members: Element, mac_address: str) -> None:
     """
-    Create a member element in the given members element.
+    Create a member element in the given 'members' element.
 
     Args:
         members (ET.Element): The parent element to which the member
@@ -847,7 +848,7 @@ def create_member_element(members: ET.Element, mac_address: str) -> None:
     Returns:
         None
     """
-    ET.SubElement(
+    SubElement(
         members,
         "Member",
         description=mac_address.replace(".", ""),
@@ -855,7 +856,7 @@ def create_member_element(members: ET.Element, mac_address: str) -> None:
     )
 
 
-def create_formatted_xml(root: ET.Element) -> str:
+def create_formatted_xml(root: Element) -> str:
     """
     Creates a formatted XML string from an ElementTree root element.
 
@@ -865,7 +866,7 @@ def create_formatted_xml(root: ET.Element) -> str:
     Returns:
         str: The formatted XML string.
     """
-    xml_string = ET.tostring(root, encoding="UTF-8").decode("utf-8")
+    xml_string = tostring(root, encoding="UTF-8").decode("utf-8")
     xml_string = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
                   + xml_string)
     dom = minidom.parseString(xml_string)
@@ -900,8 +901,7 @@ def export_txt(mac_address_set: set[str], input_file_name: str) -> None:
     Returns:
         None
     """
-    output_file_name = f'{os.path.splitext(
-        os.path.basename(input_file_name))[0]}.txt'
+    output_file_name = f'{os.path.splitext(os.path.basename(input_file_name))[0]}.txt'
     with open(f'.\\{output_file_name}', 'w', encoding="utf-8") as outfile:
         for mac_address in mac_address_set:
             outfile.write(mac_address + '\n')
@@ -917,6 +917,7 @@ def safe_exit(
         execution completion.
 
     Args:
+        log_file_path (str):
         script_start_timer (Optional[float]): The start time of the
                                                 script in seconds.
         device_counter (int): The number of devices processed.
