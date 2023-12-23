@@ -247,9 +247,8 @@ class DeviceManager:
             Processes all devices in the collection.
         process_device(self, device) -> None:
             Processes a network device to collect MAC addresses
-        extract_mac_addresses(self, mac_address_table: list[dict])
-            -> set[str]: Extracts valid MAC addresses from a given MAC
-                         address table.
+        extract_mac_addresses(self, mac_address_table: list[dict]) -> set[str]:
+            Extracts valid MAC addresses from a given MAC address table.
         is_valid_mac_address(self, mac_address: str) -> bool:
             Checks if a given string is a valid MAC address.
     """
@@ -264,8 +263,7 @@ class DeviceManager:
             device_list (list): A list of IP addresses of the network
                                 devices.
         """
-        self.devices = [NetworkDevice(ip, credentials)
-                        for ip in device_list]
+        self.devices = [NetworkDevice(ip, credentials) for ip in device_list]
         self.mac_addresses = set()
         self.failed_devices = []
 
@@ -281,85 +279,13 @@ class DeviceManager:
 
         """
         for device in self.devices:
-            device.connect()
-            self.process_device(device)
-            device.disconnect()
-
-    def process_device(self, device) -> None:
-        """
-        Process a network device to collect MAC addresses.
-
-        Args:
-            device (Device): The network device to process.
-
-        Returns:
-            None
-        """
-        LOGGER.info("Processing %s (%s)", device.hostname, device.ip_address)
-
-        vlan_brief = device.execute_command('show vlan brief')
-        device.extract_voip_vlans(vlan_brief)
-        device.extract_ap_vlans(vlan_brief)
-
-        for vlan_id in (device.voip_vlans + device.ap_vlans):
-            mac_address_table = device.execute_command(
-                f'show mac address-table vlan {vlan_id}')
-            extracted_mac_addresses = self.extract_mac_addresses(
-                mac_address_table)
-            self.mac_addresses.update(extracted_mac_addresses)
-        LOGGER.info("Finished processing %s (%s)",
-                    device.hostname, device.ip_address)
-
-    def extract_mac_addresses(self, mac_address_table: list[dict]) -> set[str]:
-        """
-        Extracts valid MAC addresses from a given MAC address table.
-
-        Args:
-            mac_address_table (list[dict]): A list of dictionaries
-                                            representing the MAC address
-                                            table.
-                Each dictionary should have 'destination_address' and
-                    'destination_port' keys.
-
-        Returns:
-            set[str]: A set of valid MAC addresses extracted from the
-                      MAC address table.
-        """
-        mac_addresses = set()
-        po_pattern = re.compile(r'(?i)(Po|Port-Channel|Switch)')
-
-        for mac_entry in mac_address_table:
-            mac_address = mac_entry.get('destination_address')
-            interfaces = mac_entry.get('destination_port')
-
-            if not isinstance(interfaces, list):
-                interfaces = [interfaces]
-
-            for interface in interfaces:
-                if (interface and
-                        not po_pattern.match(interface) and
-                        mac_address and
-                        self.is_valid_mac_address(mac_address)):
-                    LOGGER.debug("Discovered %s on %s.",
-                                 mac_address, interface)
-                    mac_addresses.add(mac_address)
-
-        return mac_addresses
-
-    @staticmethod
-    def is_valid_mac_address(mac_address: str) -> bool:
-        """
-        Check if a given string is a valid MAC address.
-
-        Args:
-            mac_address (str): The string to be checked.
-
-        Returns:
-            bool: True if the string is a valid MAC address, False
-                  otherwise.
-        """
-        mac_pattern = re.compile(r"((?:[\da-fA-F]{2}[\s:.-]?){6})")
-        return bool(mac_pattern.match(mac_address))
+            try:
+                mac_addresses = device.process_device()
+                self.mac_addresses.update(mac_addresses)
+            except Exception as e:
+                LOGGER.error("Error processing device %s: %s",
+                             device.ip_address, str(e))
+                self.failed_devices.append(device.ip_address)
 
 
 class NetworkDevice:
@@ -433,7 +359,8 @@ class NetworkDevice:
             )
             self.connection.enable()
             self.hostname = self.connection.find_prompt().strip('#>')
-            LOGGER.info("Connected to %s (%s)", self.hostname, self.ip_address)
+            LOGGER.info("Connected to %s (%s)",
+                        self.hostname, self.ip_address)
         except NetmikoTimeoutException as e:
             LOGGER.error("Timeout when connecting to %s: %s",
                          self.ip_address, e)
@@ -470,13 +397,16 @@ class NetworkDevice:
                         of the command.
         """
         if not self.connection:
-            LOGGER.error("Not connected to device %s", self.ip_address)
+            LOGGER.error("Not connected to device %s",
+                         self.ip_address)
             return [{None: None}]
 
         execution_time = time.perf_counter()
+        LOGGER.info('Executing command "%s" on %s (%s)',
+                    command, self.hostname, self.ip_address)
         try:
             output = self.connection.send_command(command, use_textfsm=fsm)
-        except InvalidInput as e:
+        except Exception as e:
             LOGGER.error("Error executing %s on %s: %s",
                          command, self.ip_address, e)
             output = [{'Error': e}]
@@ -494,6 +424,36 @@ class NetworkDevice:
 
         return output
 
+    def process_device(self):
+        LOGGER.info("Processing %s (%s)",
+                    self.hostname, self.ip_address)
+        try:
+            self.connect()
+            vlan_brief = self.execute_command('show vlan brief')
+            self.extract_vlans(vlan_brief)
+            mac_addresses = self.collect_mac_addresses()
+        finally:
+            self.disconnect()
+        LOGGER.info("Finished processing %s (%s)",
+                    self.hostname, self.ip_address)
+        return mac_addresses
+
+    def extract_vlans(self, vlan_data: list[dict]) -> None:
+        """
+        Initiates the extraction of VLANs
+
+        Args:
+            vlan_data (list[dict]): A list of dictionaries containing
+                                    VLAN information.
+
+        Returns:
+            None
+        """
+        LOGGER.debug("VLAN extraction in progress")
+        self.extract_voip_vlans(vlan_data)
+        self.extract_ap_vlans(vlan_data)
+        LOGGER.debug("VLAN extraction completed.")
+
     def extract_voip_vlans(self, vlan_data: list[dict]) -> None:
         """
         Extracts the VLAN IDs of VoIP VLANs from the given VLAN data.
@@ -509,7 +469,8 @@ class NetworkDevice:
         for vlan_info in vlan_data:
             if (
                     'vlan_name' in vlan_info and
-                    re.search(r'(?i)voip|voice\s*', vlan_info['vlan_name']) and
+                    re.search(r'(?i)voip|voice\s*',
+                              vlan_info['vlan_name']) and
                     vlan_info['interfaces'] and
                     self.is_valid_vlan_id(vlan_info['vlan_id'])
             ):
@@ -532,13 +493,73 @@ class NetworkDevice:
         for vlan_info in vlan_data:
             if (
                     'vlan_name' in vlan_info and
-                    re.search(r'(?i)ap|access\s*', vlan_info['vlan_name']) and
+                    re.search(r'(?i)ap|access\s*',
+                              vlan_info['vlan_name']) and
                     vlan_info['interfaces'] and
                     self.is_valid_vlan_id(vlan_info['vlan_id'])
             ):
                 self.ap_vlans.append(int(vlan_info['vlan_id']))
 
         LOGGER.debug("Discovered AP VLANs: %s", self.ap_vlans)
+
+    def collect_mac_addresses(self):
+        extracted_macs = set()
+        for vlan_id in (self.voip_vlans + self.ap_vlans):
+            mac_address_table = self.execute_command(f'show mac address-table '
+                                                     f'vlan {vlan_id}')
+            extracted_macs.update(self.extract_mac_addresses(mac_address_table))
+        return extracted_macs
+
+    def extract_mac_addresses(self, mac_address_table: list[dict]) -> set[str]:
+        """
+        Extracts valid MAC addresses from a given MAC address table.
+
+        Args:
+            mac_address_table (list[dict]): A list of dictionaries
+                                            representing the MAC address
+                                            table.
+                Each dictionary should have 'destination_address' and
+                    'destination_port' keys.
+
+        Returns:
+            set[str]: A set of valid MAC addresses extracted from the
+                      MAC address table.
+        """
+        mac_addresses = set()
+        po_pattern = re.compile(r'(?i)(Po|Port-Channel|Switch)')
+
+        for mac_entry in mac_address_table:
+            mac_address = mac_entry.get('destination_address')
+            interfaces = mac_entry.get('destination_port')
+
+            if not isinstance(interfaces, list):
+                interfaces = [str(interfaces)]
+
+            for interface in interfaces:
+                if (interface and
+                        not po_pattern.match(interface) and
+                        mac_address and
+                        self.is_valid_mac_address(mac_address)):
+                    LOGGER.debug("Discovered %s on %s.",
+                                 mac_address, interface)
+                    mac_addresses.add(mac_address)
+
+        return mac_addresses
+
+    @staticmethod
+    def is_valid_mac_address(mac_address: str) -> bool:
+        """
+        Check if a given string is a valid MAC address.
+
+        Args:
+            mac_address (str): The string to be checked.
+
+        Returns:
+            bool: True if the string is a valid MAC address, False
+                  otherwise.
+        """
+        mac_pattern = re.compile(r"((?:[\da-fA-F]{2}[\s:.-]?){6})")
+        return bool(mac_pattern.match(mac_address))
 
     @staticmethod
     def is_valid_vlan_id(vlan_id: str) -> bool:
@@ -806,9 +827,11 @@ def create_xml_structure(mac_address_set: set[str]) -> Element:
     LOGGER.info("Creating XML structure for %d MAC addresses.",
                 len(mac_address_set))
     static_host_list_name = input('Specify static host list name: ')
-    LOGGER.debug('Static host list name: %s', static_host_list_name)
+    LOGGER.debug('Static host list name: %s',
+                 static_host_list_name)
     static_host_list_desc = input('Specify static host list description: ')
-    LOGGER.debug('Static host list description: %s', static_host_list_desc)
+    LOGGER.debug('Static host list description: %s',
+                 static_host_list_desc)
 
     root = Element(
         "TipsContents", xmlns="http://www.avendasys.com/tipsapiDefs/1.0")
@@ -901,10 +924,10 @@ def export_txt(mac_address_set: set[str], input_file_name: str) -> None:
     Returns:
         None
     """
-    output_file_name = f'{os.path.splitext(os.path.basename(input_file_name))[0]}.txt'
-    with open(f'.\\{output_file_name}', 'w', encoding="utf-8") as outfile:
+    out_file = f'{os.path.splitext(os.path.basename(input_file_name))[0]}.txt'
+    with open(f'.\\{out_file}', 'w', encoding="utf-8") as f:
         for mac_address in mac_address_set:
-            outfile.write(mac_address + '\n')
+            f.write(mac_address + '\n')
 
 
 def safe_exit(
