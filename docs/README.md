@@ -293,4 +293,4 @@ Thank you for contributing to this project and helping make it better for everyo
 
 ## License
 
-This project is licensed under the [MIT License](..\LICENSE) - see the [LICENSE](..\LICENSE) file for details.
+This project is licensed under the [MIT License](../LICENSE) - see the [LICENSE](../LICENSE) file for details.
