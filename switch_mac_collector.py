@@ -56,8 +56,8 @@ For any questions or issues, please contact the script author,
 Noah Isaac Keller, at nkeller@choctawnation.com.
 """
 
-__author__ = 'Noah Isaac Keller'
-__maintainer__ = 'Noah Isaac Keller'
+__author__ = 'Noah Keller'
+__maintainer__ = 'Noah Keller'
 __email__ = 'nkeller@choctawnation.com'
 
 import argparse
@@ -84,6 +84,7 @@ from paramiko.ssh_exception import SSHException
 
 # Global variables
 LOGGER = logging.getLogger(__name__)
+
 
 
 # ----------------------------------------------------------------------
@@ -253,6 +254,7 @@ class DeviceManager:
             Checks if a given string is a valid MAC address.
     """
 
+
     def __init__(self, credentials, device_list) -> None:
         """
         Initializes the SwitchMacCollector object.
@@ -318,6 +320,7 @@ class NetworkDevice:
         is_valid_vlan_id(self, vlan_id) -> bool:
             Check if the given VLAN ID is valid.
     """
+
 
     def __init__(self, ip_address: str, credentials: dict) -> None:
         """
@@ -425,6 +428,14 @@ class NetworkDevice:
         return output
 
     def process_device(self):
+        """
+        Process the device by connecting to it, extracting VLAN
+        information, collecting MAC addresses, and then disconnecting
+        from the device.
+
+        Returns:
+            list: A list of MAC addresses collected from the device.
+        """
         LOGGER.info("Processing %s (%s)",
                     self.hostname, self.ip_address)
         try:
@@ -503,10 +514,17 @@ class NetworkDevice:
         LOGGER.debug("Discovered AP VLANs: %s", self.ap_vlans)
 
     def collect_mac_addresses(self):
+        """
+        Collects MAC addresses from the switch for the specified
+        VLANs.
+
+        Returns:
+            set: A set of extracted MAC addresses.
+        """
         extracted_macs = set()
         for vlan_id in (self.voip_vlans + self.ap_vlans):
             mac_address_table = self.execute_command(f'show mac address-table '
-                                                     f'vlan {vlan_id}')
+                                                        f'vlan {vlan_id}')
             extracted_macs.update(self.extract_mac_addresses(mac_address_table))
         return extracted_macs
 
@@ -595,7 +613,8 @@ class ScriptExit(Exception):
 
 
 class InvalidInput(Exception):
-    """Exception raised for invalid input.
+    """
+    Exception raised for invalid input.
 
     Attributes:
         message (str): Explanation of the error

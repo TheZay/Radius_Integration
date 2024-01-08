@@ -1,9 +1,66 @@
+"""
+This module contains unit tests for the `switch_mac_collector` module.
+
+Classes:
+    TestNetworkDevice: Contains tests for the `NetworkDevice` class.
+    TestDeviceManager: Contains tests for the `DeviceManager` class.
+    TestLoadConfig: Contains tests for the `load_config` function.
+
+The `TestNetworkDevice` class tests the following:
+
+    - The `setUp` method prepares the environment for each test. It sets
+        up a `NetworkDevice` instance and mocks the `ConnectHandler`
+        used in the `NetworkDevice` class.
+    - The `test_connect_success` method tests the scenario where a
+        connection to the network device is successful.
+    - The `test_disconnect_success` method tests the scenario where a
+        disconnection from the network device is successful.
+    - The `test_execute_command_success` method tests the scenario where
+        a command is successfully executed on the network device.
+
+The `TestDeviceManager` class tests the following:
+
+    - The `setUp` method prepares the environment for each test. It sets
+        up the credentials and device list used for testing the
+        `DeviceManager` class.
+    - The `test_process_all_devices` method tests the scenario where all
+        devices in the device list are processed.
+
+The `TestLoadConfig` class tests the following:
+
+    - The `test_load_config_existing_file` method tests the scenario
+        where the configuration is loaded from an existing file.
+    - The `test_load_config_non_existing_file` method tests the scenario
+        where a `FileNotFoundError` is raised when trying to load a
+        non-existing config file.
+
+Each test case in `TestNetworkDevice`, `TestDeviceManager`, and
+`TestLoadConfig` is isolated, meaning that the setup happens for each
+test, preventing tests from affecting each other.
+"""
+import os
+import sys
 import unittest
-from unittest.mock import patch, MagicMock
-from switch_mac_collector import DeviceManager, NetworkDevice
+from unittest.mock import MagicMock, patch
+
+# Calculate the absoluate path to the parent directory of the current
+#  script.
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+
+# Add the parent directory to sys.path to access modules from there
+sys.path.append(parent_dir)
+
+# Now you can import modules from the parent directory
+# pylint: disable=wrong-import-position
+from switch_mac_collector import DeviceManager, NetworkDevice, load_config
 
 
 class TestNetworkDevice(unittest.TestCase):
+    """
+    Unit tests for the NetworkDevice class.
+    """
+
     def setUp(self):
         self.credentials = {'username': 'admin', 'password': 'password'}
         self.device_ip = '192.168.1.1'
@@ -13,12 +70,20 @@ class TestNetworkDevice(unittest.TestCase):
         self.mock_connect_handler = patcher.start()
         self.mock_connection = MagicMock()
         self.mock_connect_handler.return_value = self.mock_connection
-        self.mock_connection.find_prompt.return_value = 'Switch>'
+        self.mock_connection.find_prompt.return_value = 'Switch'
 
         # Ensure that the patcher is stopped after tests
         self.addCleanup(patcher.stop)
 
     def test_connect_success(self):
+        """
+        Test case to verify successful connection to the network device.
+
+        This test mocks the ConnectHandler used in the network device and asserts
+        that it was called correctly with the expected parameters. It also checks
+        if the hostname of the network device is set correctly.
+
+        """
         # Mock the ConnectHandler used in the network device
         self.network_device.connect()
 
@@ -32,6 +97,14 @@ class TestNetworkDevice(unittest.TestCase):
         self.assertEqual(self.network_device.hostname, 'Switch')
 
     def test_disconnect_success(self):
+        """
+        Test case to verify successful disconnection from the network
+        device.
+
+        This test connects to the network device, disconnects, and then
+        asserts that the disconnect method was called on the connection
+        object.
+        """
         self.network_device.connect()
         self.network_device.disconnect()
         # Assert that the disconnect method was called on the connection
@@ -39,6 +112,15 @@ class TestNetworkDevice(unittest.TestCase):
         self.mock_connection.disconnect.assert_called_once()
 
     def test_execute_command_success(self):
+        """
+        Test case to verify the success of the execute_command method.
+
+        It mocks the send_command method of the network device
+          connection and sets the return value to 'command output'.
+        Then it connects to the network device, executes the
+          'show version' command, and asserts that the output matches
+          the expected value [{'output': 'command output'}].
+        """
         self.mock_connection.send_command.return_value = 'command output'
         self.network_device.connect()
         output = self.network_device.execute_command('show version')
@@ -109,11 +191,12 @@ class TestDeviceManager(unittest.TestCase):
         mock_device_two.process_device.side_effect = (
             Exception("Connection Error"))
 
-        # Configuring the side effect of the NetworkDevice class constructor
-        def side_effect(ip_address, credentials):
+        # Configuring the side effect of the NetworkDevice class
+        #  constructor
+        def side_effect(ip_address, _):
             if ip_address == '192.168.1.1':
                 return mock_device_one
-            elif ip_address == '192.168.1.2':
+            if ip_address == '192.168.1.2':
                 return mock_device_two
 
         mock_network_device_class.side_effect = side_effect
@@ -128,6 +211,55 @@ class TestDeviceManager(unittest.TestCase):
         # Assert that the mock was called for each device
         self.assertEqual(mock_network_device_class.call_count,
                          len(self.device_list))
+
+
+class TestLoadConfig(unittest.TestCase):
+    """
+    Test case class for testing the load_config function.
+    """
+
+    def test_load_config_existing_file(self):
+        """
+        Test case to verify the behavior of the load_config function
+        when given an existing file path.
+
+        The function should load the configuration from the specified
+        file path and return the expected configuration.
+
+        Steps:
+        1. Arrange the necessary test data, including the file path and
+           the expected configuration.
+        2. Call the load_config function with the file path.
+        3. Assert that the returned configuration matches the expected
+           configuration.
+        """
+        # Arrange
+        file_path = 'config.json'
+        expected_config = {
+            'log_file_path': '.\\logs\\switch_collector.log',
+            'logging_level': 'INFO',
+            'max_threads': 5,
+            'retry_attempts': 3,
+            'retry_delay': 5
+        }
+
+        # Act
+        config = load_config(file_path)
+
+        # Assert
+        self.assertEqual(config, expected_config)
+
+    def test_load_config_non_existing_file(self):
+        """
+        Test case to verify that a FileNotFoundError is raised when
+        trying to load a non-existing config file.
+        """
+        # Arrange
+        file_path = 'non_existing_config.json'
+
+        # Act and Assert
+        with self.assertRaises(FileNotFoundError):
+            load_config(file_path)
 
 
 def create_mock_network_device(ip_address):
