@@ -58,10 +58,29 @@ from switch_mac_collector import DeviceManager, NetworkDevice, load_config
 
 class TestNetworkDevice(unittest.TestCase):
     """
-    Unit tests for the NetworkDevice class.
+    TestNetworkDevice is a test suite for testing the NetworkDevice
+    class.
+
+    This suite includes unit tests that cover the functionality of the
+    NetworkDevice class, ensuring that it correctly handles network
+    connections, disconnections, and command execution.
+
+    Attributes:
+        credentials (dict): Authentication credentials used to
+            instantiate NetworkDevice objects.
+        device_ip (str): The IP address of the network device.
+        network_device (NetworkDevice): The NetworkDevice instance under
+            test.
     """
 
     def setUp(self):
+        """
+        Set up the test environment before each test method.
+
+        This method initializes the credentials and device_ip used for
+        testing the NetworkDevice class. It also creates an instance of
+        NetworkDevice with these credentials and the device IP.
+        """
         self.credentials = {'username': 'admin', 'password': 'password'}
         self.device_ip = '192.168.1.1'
         self.network_device = NetworkDevice(self.device_ip, self.credentials)
@@ -77,12 +96,12 @@ class TestNetworkDevice(unittest.TestCase):
 
     def test_connect_success(self):
         """
-        Test case to verify successful connection to the network device.
+        Verify successful connection to the network device.
 
-        This test mocks the ConnectHandler used in the network device and asserts
-        that it was called correctly with the expected parameters. It also checks
-        if the hostname of the network device is set correctly.
-
+        This test mocks the ConnectHandler used in the network device
+        and asserts that it was called correctly with the expected
+        parameters. It also checks if the hostname of the network device
+        is set correctly.
         """
         # Mock the ConnectHandler used in the network device
         self.network_device.connect()
@@ -98,8 +117,7 @@ class TestNetworkDevice(unittest.TestCase):
 
     def test_disconnect_success(self):
         """
-        Test case to verify successful disconnection from the network
-        device.
+        Verify successful disconnection from the network device.
 
         This test connects to the network device, disconnects, and then
         asserts that the disconnect method was called on the connection
@@ -113,7 +131,7 @@ class TestNetworkDevice(unittest.TestCase):
 
     def test_execute_command_success(self):
         """
-        Test case to verify the success of the execute_command method.
+        Verify the success of the execute_command method.
 
         It mocks the send_command method of the network device
           connection and sets the return value to 'command output'.
@@ -145,7 +163,6 @@ class TestDeviceManager(unittest.TestCase):
         device_manager (DeviceManager): The DeviceManager instance under
             test.
     """
-
     def setUp(self):
         """
         Set up the test environment before each test method.
@@ -216,8 +233,11 @@ class TestDeviceManager(unittest.TestCase):
 class TestLoadConfig(unittest.TestCase):
     """
     Test case class for testing the load_config function.
-    """
 
+    This class contains test cases that verify the behavior of the
+    load_config function when given an existing file path and when given
+    a non-existing file path.
+    """
     def test_load_config_existing_file(self):
         """
         Test case to verify the behavior of the load_config function

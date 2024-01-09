@@ -148,3 +148,6 @@ dmypy.json
 
 # VSCode settings
 .vscode/
+
+# Generated files
+*.xml

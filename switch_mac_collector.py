@@ -92,7 +92,8 @@ LOGGER = logging.getLogger(__name__)
 # ----------------------------------------------------------------------
 def load_config(file_path: str = 'config.json') -> dict:
     """
-    Load the configuration from a JSON file.
+    Load the configuration from a JSON file. If the file does not exist,
+        returns an empty dictionary.
 
     Args:
         file_path (str, optional): The path to the configuration file.
@@ -100,15 +101,12 @@ def load_config(file_path: str = 'config.json') -> dict:
 
     Returns:
         dict: The loaded configuration as a dictionary.
-
-    Raises:
-        FileNotFoundError: If the configuration file is not found.
     """
     if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Configuration file not found: {file_path}")
-    with open(file_path, 'r', encoding="utf-8") as f:
-        config = json.load(f)
-    return config
+        print(f'Configuration file {file_path} not found. Using default '
+              f'settings.')
+    with open(file_path, 'r', encoding="utf-8") as file:
+        return json.load(file)
 
 
 def setup_logging(log_file_path: str, log_level: str) -> None:
@@ -122,31 +120,9 @@ def setup_logging(log_file_path: str, log_level: str) -> None:
     Returns:
         None
     """
-    file_handler = create_file_handler(log_file_path)
-    console_handler = create_console_handler()
-
-    LOGGER.addHandler(file_handler)
-    LOGGER.addHandler(console_handler)
-
-    LOGGER.setLevel(log_level.upper())
-
-    if log_level != 'INFO':
-        LOGGER.log(logging.INFO, 'Log level set to %s', log_level)
-
-
-def create_file_handler(log_file_name: str) -> logging.Handler:
-    """
-    Create a file handler for logging.
-
-    Args:
-        log_file_name (str): The name of the log file.
-
-    Returns:
-        logging.Handler: The file handler object.
-
-    """
+    # Create file handler for logging
     file_handler = RotatingFileHandler(
-        log_file_name,
+        log_file_path,
         maxBytes=1024 * 1024,
         backupCount=5
     )
@@ -155,21 +131,20 @@ def create_file_handler(log_file_name: str) -> logging.Handler:
         '[%(levelname)-5s][%(asctime)s][%(process)d] %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     ))
-    return file_handler
 
-
-def create_console_handler() -> logging.Handler:
-    """
-    Create a console handler for logging.
-
-    Returns:
-        logging.Handler: The console handler object.
-    """
+    # Create console handler for logging
     console_handler = logging.StreamHandler()
-    # console_handler.setLevel(logging.INFO)
+    console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(logging.Formatter(
         '[%(levelname)-5s] %(message)s'))
-    return console_handler
+
+    # Add handlers to the logger
+    LOGGER.addHandler(file_handler)
+    LOGGER.addHandler(console_handler)
+    LOGGER.setLevel(log_level.upper())
+
+    if log_level != 'INFO':
+        LOGGER.log(logging.INFO, 'Log level set to %s', log_level)
 
 
 def add_separator_to_log(log_file_path: str, separator: str = '-' * 80):
@@ -257,7 +232,7 @@ class DeviceManager:
 
     def __init__(self, credentials, device_list) -> None:
         """
-        Initializes the SwitchMacCollector object.
+        Initializes the DeviceManager object.
 
         Args:
             credentials (dict): A dictionary containing the credentials
