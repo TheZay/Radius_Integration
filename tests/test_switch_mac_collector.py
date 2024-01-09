@@ -282,23 +282,5 @@ class TestLoadConfig(unittest.TestCase):
             load_config(file_path)
 
 
-def create_mock_network_device(ip_address):
-    """
-    Factory method to create a mock NetworkDevice with a specified IP
-    address.
-
-    Args:
-        ip_address: The IP address of the mock NetworkDevice.
-
-    Returns:
-        A mock NetworkDevice instance.
-    """
-    mock_device = MagicMock(spec=NetworkDevice)
-    mock_device.ip_address = ip_address
-    # Set up other attributes and return values as needed
-    mock_device.process_device.return_value = {'00:1A:2B:3C:4D:5E'}
-    return mock_device
-
-
 if __name__ == '__main__':
     unittest.main()

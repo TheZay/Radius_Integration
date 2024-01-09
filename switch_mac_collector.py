@@ -134,14 +134,14 @@ def setup_logging(log_file_path: str, log_level: str) -> None:
 
     # Create console handler for logging
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
+    console_handler.setLevel(log_level.upper())
     console_handler.setFormatter(logging.Formatter(
         '[%(levelname)-5s] %(message)s'))
 
     # Add handlers to the logger
     LOGGER.addHandler(file_handler)
     LOGGER.addHandler(console_handler)
-    LOGGER.setLevel(log_level.upper())
+    LOGGER.setLevel(logging.DEBUG)
 
     if log_level != 'INFO':
         LOGGER.log(logging.INFO, 'Log level set to %s', log_level)
