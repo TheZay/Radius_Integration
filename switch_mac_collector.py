@@ -61,6 +61,7 @@ __maintainer__ = 'Noah Keller'
 __email__ = 'nkeller@choctawnation.com'
 
 import argparse
+import functools
 import getpass
 import ipaddress
 import json
@@ -73,7 +74,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from logging.handlers import RotatingFileHandler
-from typing import List, Optional
+from typing import Any, Callable, List, Optional
 from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
 
@@ -85,6 +86,35 @@ from paramiko.ssh_exception import SSHException
 # Global variables
 LOGGER = logging.getLogger(__name__)
 
+
+# ----------------------------------------------------------------------
+#                Decorators for Logging and Error Handling
+# ----------------------------------------------------------------------
+def debug_log(func: Callable[..., Any]) -> Callable[..., Any]:
+    """Decorator that logs the function call and return value."""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        arguments = [repr(a) for a in args]
+        keyword_arguments = [f'{k}={v!r}' for k, v in kwargs.items()]
+        signature = ', '.join(arguments + keyword_arguments)
+        LOGGER.debug('Calling %s(%s)', func.__name__, signature)
+        result = func(*args, **kwargs)
+        LOGGER.debug('"%s" returned %r', func.__name__, result)
+        return result
+    return wrapper
+
+
+def runtime_monitor(func: Callable[..., Any]) -> Callable[..., Any]:
+    """Decorator that measures the runtime of a function."""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        elapsed_time = time.perf_counter() - start_time
+        LOGGER.debug('"%s" executed in %0.2f seconds.',
+                     func.__name__, elapsed_time)
+        return result
+    return wrapper
 
 
 # ----------------------------------------------------------------------
@@ -244,6 +274,8 @@ class DeviceManager:
         self.mac_addresses = set()
         self.failed_devices = []
 
+    @debug_log
+    @runtime_monitor
     def process_all_devices(self) -> None:
         """
         Process all devices in the collection.
@@ -314,6 +346,8 @@ class NetworkDevice:
         self.voip_vlans = []
         self.ap_vlans = []
 
+    @debug_log
+    @runtime_monitor
     def connect(self) -> None:
         """
         Connects to the device using the provided credentials and device
@@ -349,6 +383,8 @@ class NetworkDevice:
             LOGGER.error("Failed to retrieve the hostname for %s: %s",
                          self.ip_address, e)
 
+    @debug_log
+    @runtime_monitor
     def disconnect(self) -> None:
         """
         Disconnects from the switch.
@@ -361,6 +397,8 @@ class NetworkDevice:
             LOGGER.info("Disconnected from %s (%s)",
                         self.hostname, self.ip_address)
 
+    @debug_log
+    @runtime_monitor
     def execute_command(self, command: str, fsm: bool = True) -> list[dict]:
         """
         Executes a command on the device and returns the output.
@@ -402,6 +440,8 @@ class NetworkDevice:
 
         return output
 
+    @debug_log
+    @runtime_monitor
     def process_device(self):
         """
         Process the device by connecting to it, extracting VLAN
@@ -416,15 +456,24 @@ class NetworkDevice:
         try:
             self.connect()
             vlan_brief = self.execute_command('show vlan brief')
-            self.extract_vlans(vlan_brief)
-            mac_addresses = self.collect_mac_addresses()
+            vlan_ids = NetworkDataProcessor.extract_vlans(vlan_brief)
+            mac_addresses = NetworkDataProcessor.collect_mac_addresses(
+                vlan_ids, self.execute_command)
         finally:
             self.disconnect()
         LOGGER.info("Finished processing %s (%s)",
                     self.hostname, self.ip_address)
         return mac_addresses
 
-    def extract_vlans(self, vlan_data: list[dict]) -> None:
+
+class NetworkDataProcessor:
+    """A class that processes network data and extracts VLAN and MAC
+        address information."""
+
+    @staticmethod
+    @debug_log
+    @runtime_monitor
+    def extract_vlans(vlan_data: list[dict]):
         """
         Initiates the extraction of VLANs
 
@@ -436,11 +485,15 @@ class NetworkDevice:
             None
         """
         LOGGER.debug("VLAN extraction in progress")
-        self.extract_voip_vlans(vlan_data)
-        self.extract_ap_vlans(vlan_data)
+        voip_vlans = NetworkDataProcessor.extract_voip_vlans(vlan_data)
+        ap_vlans = NetworkDataProcessor.extract_ap_vlans(vlan_data)
         LOGGER.debug("VLAN extraction completed.")
+        return voip_vlans + ap_vlans
 
-    def extract_voip_vlans(self, vlan_data: list[dict]) -> None:
+    @staticmethod
+    @debug_log
+    @runtime_monitor
+    def extract_voip_vlans(vlan_data: list[dict]):
         """
         Extracts the VLAN IDs of VoIP VLANs from the given VLAN data.
 
@@ -452,19 +505,24 @@ class NetworkDevice:
             None
 
         """
+        voip_vlans = []
         for vlan_info in vlan_data:
             if (
                     'vlan_name' in vlan_info and
                     re.search(r'(?i)voip|voice\s*',
                               vlan_info['vlan_name']) and
                     vlan_info['interfaces'] and
-                    self.is_valid_vlan_id(vlan_info['vlan_id'])
+                    NetworkDataProcessor.is_valid_vlan_id(vlan_info['vlan_id'])
             ):
-                self.voip_vlans.append(int(vlan_info['vlan_id']))
+                voip_vlans.append(int(vlan_info['vlan_id']))
 
-        LOGGER.debug("Discovered VoIP VLANs: %s", self.voip_vlans)
+        LOGGER.debug("Discovered VoIP VLANs: %s", voip_vlans)
+        return voip_vlans
 
-    def extract_ap_vlans(self, vlan_data: list[dict]) -> None:
+    @staticmethod
+    @debug_log
+    @runtime_monitor
+    def extract_ap_vlans(vlan_data: list[dict]):
         """
         Extracts the VLAN IDs of AP VLANs from the given VLAN data.
 
@@ -476,19 +534,25 @@ class NetworkDevice:
             None
 
         """
+        ap_vlans = []
         for vlan_info in vlan_data:
             if (
                     'vlan_name' in vlan_info and
                     re.search(r'(?i)ap|access\s*',
                               vlan_info['vlan_name']) and
                     vlan_info['interfaces'] and
-                    self.is_valid_vlan_id(vlan_info['vlan_id'])
+                    NetworkDataProcessor.is_valid_vlan_id(vlan_info['vlan_id'])
             ):
-                self.ap_vlans.append(int(vlan_info['vlan_id']))
+                ap_vlans.append(int(vlan_info['vlan_id']))
 
-        LOGGER.debug("Discovered AP VLANs: %s", self.ap_vlans)
+        LOGGER.debug("Discovered AP VLANs: %s", ap_vlans)
+        return ap_vlans
 
-    def collect_mac_addresses(self):
+    @staticmethod
+    @debug_log
+    @runtime_monitor
+    def collect_mac_addresses(vlan_ids: list[int],
+                              command_executor: Callable) -> set[str]:
         """
         Collects MAC addresses from the switch for the specified
         VLANs.
@@ -497,13 +561,17 @@ class NetworkDevice:
             set: A set of extracted MAC addresses.
         """
         extracted_macs = set()
-        for vlan_id in (self.voip_vlans + self.ap_vlans):
-            mac_address_table = self.execute_command(f'show mac address-table '
-                                                        f'vlan {vlan_id}')
-            extracted_macs.update(self.extract_mac_addresses(mac_address_table))
+        for vlan_id in vlan_ids:
+            command = f'show mac address-table vlan {vlan_id}'
+            mac_address_table = command_executor(command)
+            extracted_macs.update(
+                NetworkDataProcessor.extract_mac_addresses(mac_address_table))
         return extracted_macs
 
-    def extract_mac_addresses(self, mac_address_table: list[dict]) -> set[str]:
+    @staticmethod
+    @debug_log
+    @runtime_monitor
+    def extract_mac_addresses(mac_address_table: list[dict]) -> set[str]:
         """
         Extracts valid MAC addresses from a given MAC address table.
 
@@ -532,7 +600,7 @@ class NetworkDevice:
                 if (interface and
                         not po_pattern.match(interface) and
                         mac_address and
-                        self.is_valid_mac_address(mac_address)):
+                        NetworkDataProcessor.is_valid_mac_address(mac_address)):
                     LOGGER.debug("Discovered %s on %s.",
                                  mac_address, interface)
                     mac_addresses.add(mac_address)
