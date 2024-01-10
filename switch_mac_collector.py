@@ -417,7 +417,6 @@ class NetworkDevice:
                          self.ip_address)
             return [{None: None}]
 
-        execution_time = time.perf_counter()
         LOGGER.info('Executing command "%s" on %s (%s)',
                     command, self.hostname, self.ip_address)
         try:
@@ -426,10 +425,6 @@ class NetworkDevice:
             LOGGER.error("Error executing %s on %s: %s",
                          command, self.ip_address, e)
             output = [{'Error': e}]
-        finally:
-            elapsed_time = time.perf_counter() - execution_time
-            LOGGER.debug('Command "%s" executed in %0.2f seconds.',
-                         command, elapsed_time)
 
         if isinstance(output, dict):
             # Handle the case where the output is a dictionary
@@ -673,6 +668,8 @@ class InvalidInput(Exception):
         return f'{self.message} (exit code: {self.exit_code})'
 
 
+@debug_log
+@runtime_monitor
 def validate_input(args: argparse.Namespace) -> List[str]:
     """
     Validates the input arguments and returns a list of IP addresses.
@@ -702,6 +699,7 @@ def validate_input(args: argparse.Namespace) -> List[str]:
     return ip_addresses
 
 
+@runtime_monitor
 def get_credentials() -> dict:
     """
     Prompts the user to enter their username and password and returns
@@ -737,6 +735,8 @@ def get_credentials() -> dict:
     return {"username": username, "password": password}
 
 
+@debug_log
+@runtime_monitor
 def process_text_file(file_path: str) -> List[str]:
     """
     Reads a text file and returns a list of IP addresses.
@@ -752,6 +752,8 @@ def process_text_file(file_path: str) -> List[str]:
     return ip_addresses
 
 
+@debug_log
+@runtime_monitor
 def process_yaml_file(file_path: str) -> List[str]:
     """
     Process a YAML file and extract a list of hosts.
@@ -774,6 +776,8 @@ def process_yaml_file(file_path: str) -> List[str]:
     return ip_addresses
 
 
+@debug_log
+@runtime_monitor
 def is_valid_ip_address(ip_address: str) -> bool:
     """
     Check if a given string is a valid IP address.
@@ -791,6 +795,8 @@ def is_valid_ip_address(ip_address: str) -> bool:
         return False
 
 
+@debug_log
+@runtime_monitor
 def process_file(file_path: str) -> List[str]:
     """
     Process the IP addresses from a file.
@@ -815,6 +821,8 @@ def process_file(file_path: str) -> List[str]:
     return ip_addresses
 
 
+@debug_log
+@runtime_monitor
 def process_subnet(subnet: str) -> List[str]:
     """
     Process a subnet and return a list of IP addresses within the subnet.
@@ -836,6 +844,8 @@ def process_subnet(subnet: str) -> List[str]:
         raise InvalidInput("Invalid subnet format") from e
 
 
+@debug_log
+@runtime_monitor
 def process_ip_range(ip_range: str) -> List[str]:
     """
     Process an IP range and return a list of summarized IP addresses.
@@ -1029,6 +1039,7 @@ def safe_exit(
     sys.exit()
 
 
+@runtime_monitor
 def main() -> None:
     """
     Entry point of the script. Executes the main logic of the switch MAC
