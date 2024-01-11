@@ -38,22 +38,11 @@ Each test case in `TestNetworkDevice`, `TestDeviceManager`, and
 `TestLoadConfig` is isolated, meaning that the setup happens for each
 test, preventing tests from affecting each other.
 """
-import os
-import sys
 import unittest
 from unittest.mock import MagicMock, patch
-
-# Calculate the absoluate path to the parent directory of the current
-#  script.
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-
-# Add the parent directory to sys.path to access modules from there
-sys.path.append(parent_dir)
-
-# Now you can import modules from the parent directory
-# pylint: disable=wrong-import-position
-from switch_mac_collector import DeviceManager, NetworkDevice, load_config
+from src.device_manager import DeviceManager
+from src.network_device import NetworkDevice
+from src.config_manager import load_config
 
 
 class TestNetworkDevice(unittest.TestCase):
