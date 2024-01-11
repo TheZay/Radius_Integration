@@ -1,7 +1,7 @@
 """Manages multiple NetworkDevice instances."""
-from src.logging_setup import LOGGER
-from src.utilities import debug_log, runtime_monitor
-from src.network_device import NetworkDevice
+from .logging_setup import LOGGER
+from .utilities import debug_log, runtime_monitor
+from .network_device import NetworkDevice
 
 
 class DeviceManager:

@@ -65,13 +65,14 @@ import getpass
 import msvcrt
 import time
 from datetime import datetime
-from src.logging_setup import LOGGER, setup_logging
-from src.exceptions import InvalidInput, ScriptExit
-from src.device_manager import DeviceManager
-from src.exporters import export_xml
-from src.config_manager import load_config
-from src.file_processors import validate_input
-from src.utilities import safe_exit
+
+from .logging_setup import LOGGER, setup_logging
+from .exceptions import InvalidInput, ScriptExit
+from .device_manager import DeviceManager
+from .exporters import export_xml
+from .config_manager import load_config
+from .file_processors import validate_input
+from .utilities import safe_exit
 
 
 def parse_args(config: dict) -> argparse.Namespace:

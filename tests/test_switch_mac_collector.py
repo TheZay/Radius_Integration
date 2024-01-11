@@ -74,7 +74,7 @@ class TestNetworkDevice(unittest.TestCase):
         self.device_ip = '192.168.1.1'
         self.network_device = NetworkDevice(self.device_ip, self.credentials)
 
-        patcher = patch('switch_mac_collector.ConnectHandler', autospec=True)
+        patcher = patch('src.network_device.ConnectHandler', autospec=True)
         self.mock_connect_handler = patcher.start()
         self.mock_connection = MagicMock()
         self.mock_connect_handler.return_value = self.mock_connection
@@ -163,7 +163,7 @@ class TestDeviceManager(unittest.TestCase):
         self.credentials = {'username': 'admin', 'password': 'password'}
         self.device_list = ['192.168.1.1', '192.168.1.2']
 
-    @patch('switch_mac_collector.NetworkDevice')
+    @patch('src.device_manager.NetworkDevice')
     def test_process_all_devices(self, mock_network_device_class):
         """
         Test the process_all_devices method of the DeviceManager class.
@@ -243,9 +243,9 @@ class TestLoadConfig(unittest.TestCase):
            configuration.
         """
         # Arrange
-        file_path = 'config.json'
+        file_path = 'configs\\config.json'
         expected_config = {
-            'log_file_path': '.\\logs\\switch_collector.log',
+            'log_file_path': 'logs\\switch_collector.log',
             'logging_level': 'INFO',
             'max_threads': 5,
             'retry_attempts': 3,

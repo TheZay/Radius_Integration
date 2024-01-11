@@ -3,9 +3,9 @@ from netmiko import (ConnectHandler, NetmikoAuthenticationException,
                      NetmikoTimeoutException)
 from paramiko.ssh_exception import SSHException
 
-from src.data_processor import NetworkDataProcessor
-from src.utilities import debug_log, runtime_monitor
-from src.logging_setup import LOGGER
+from .data_processor import NetworkDataProcessor
+from .utilities import debug_log, runtime_monitor
+from .logging_setup import LOGGER
 
 
 class NetworkDevice:

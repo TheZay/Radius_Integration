@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-from src.logging_setup import LOGGER
+from .logging_setup import LOGGER
 
 
 def export_xml(mac_address_set: set[str]) -> None:
@@ -118,8 +118,8 @@ def save_formatted_xml(xml_string: str) -> None:
     """
     # Debug: Print the XML string before writing to the file
     LOGGER.debug('Saving XML to file')
-    output_file_name = f'.\\smc_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xml'
-    with open(output_file_name, 'wb') as xml_file:
+    output_file_name = f'smc_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xml'
+    with open(f'data\\{output_file_name}', 'wb') as xml_file:
         xml_file.write(xml_string.encode())
 
 

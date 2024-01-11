@@ -148,7 +148,9 @@ dmypy.json
 
 # User settings
 .vscode/
+*vscode/
 .idea/
+*idea/
 
 # Generated files
 *.xml

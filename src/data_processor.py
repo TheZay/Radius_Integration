@@ -2,8 +2,8 @@
 import re
 from typing import Callable
 
-from src.utilities import debug_log, runtime_monitor
-from src.logging_setup import LOGGER
+from .utilities import debug_log, runtime_monitor
+from .logging_setup import LOGGER
 
 
 class NetworkDataProcessor:

@@ -5,9 +5,9 @@ import ipaddress
 from typing import List
 import yaml
 
-from src.exceptions import InvalidInput
-from src.logging_setup import LOGGER
-from src.utilities import debug_log, runtime_monitor, safe_exit
+from .exceptions import InvalidInput
+from .logging_setup import LOGGER
+from .utilities import debug_log, runtime_monitor, safe_exit
 
 
 @debug_log

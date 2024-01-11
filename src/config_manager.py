@@ -2,7 +2,7 @@
 import json
 import os.path
 
-def load_config(file_path: str = 'config.json') -> dict:
+def load_config(file_path: str = 'configs\\config.json') -> dict:
     """
     Load the configuration from a JSON file. If the file does not exist,
         returns an empty dictionary.

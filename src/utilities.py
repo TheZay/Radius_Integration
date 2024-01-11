@@ -5,7 +5,7 @@ import time
 import sys
 from typing import Any, Callable, Optional
 
-from src.logging_setup import LOGGER, add_separator_to_log
+from .logging_setup import LOGGER, add_separator_to_log
 
 
 
