@@ -99,7 +99,7 @@ def debug_log(func: Callable[..., Any]) -> Callable[..., Any]:
         signature = ', '.join(arguments + keyword_arguments)
         LOGGER.debug('Calling %s(%s)', func.__name__, signature)
         result = func(*args, **kwargs)
-        LOGGER.debug('"%s" returned %r', func.__name__, result)
+        LOGGER.debug('%s() returned %r', func.__name__, result)
         return result
     return wrapper
 
@@ -111,7 +111,7 @@ def runtime_monitor(func: Callable[..., Any]) -> Callable[..., Any]:
         start_time = time.perf_counter()
         result = func(*args, **kwargs)
         elapsed_time = time.perf_counter() - start_time
-        LOGGER.debug('"%s" executed in %0.2f seconds.',
+        LOGGER.debug('%s() executed in %0.2f seconds.',
                      func.__name__, elapsed_time)
         return result
     return wrapper
@@ -343,8 +343,6 @@ class NetworkDevice:
         self.device_type = 'cisco_ios'
         self.connection = None
         self.hostname = "Unknown"
-        self.voip_vlans = []
-        self.ap_vlans = []
 
     @debug_log
     @runtime_monitor
@@ -479,6 +477,7 @@ class NetworkDataProcessor:
         Returns:
             None
         """
+        
         LOGGER.debug("VLAN extraction in progress")
         voip_vlans = NetworkDataProcessor.extract_voip_vlans(vlan_data)
         ap_vlans = NetworkDataProcessor.extract_ap_vlans(vlan_data)
@@ -699,6 +698,173 @@ def validate_input(args: argparse.Namespace) -> List[str]:
     return ip_addresses
 
 
+@debug_log
+@runtime_monitor
+def process_file(file_path: str) -> List[str]:
+    """
+    Process the IP addresses from a file.
+
+    Args:
+        file_path (str): The path to the file.
+
+    Returns:
+        List[str]: A list of IP addresses extracted from the file.
+    """
+    LOGGER.info("Processing IP addresses from file: %s", file_path)
+
+    ip_addresses = []
+    if file_path.endswith('.txt') or file_path.endswith('.text'):
+        ip_addresses = process_text_file(file_path)
+    elif file_path.endswith('.yml') or file_path.endswith('.yaml'):
+        ip_addresses = process_yaml_file(file_path)
+    else:
+        LOGGER.error("Invalid file type. Exiting the script.")
+        safe_exit()
+
+    return ip_addresses
+
+
+@debug_log
+@runtime_monitor
+def process_text_file(file_path: str) -> List[str]:
+    """
+    Reads a text file and returns a list of IP addresses.
+
+    Args:
+        file_path (str): The path to the text file.
+
+    Returns:
+        List[str]: A list of IP addresses read from the file.
+    """
+    ip_addresses = []
+    with open(file_path, 'r', encoding="utf-8") as file:
+        for line in file:
+            ip = line.strip()
+            if is_valid_ip_address(ip):
+                ip_addresses.append(ip)
+            else:
+                LOGGER.warning('Skipped invalid IP address (%s) found in file '
+                               '(%s).', ip, file_path)
+    return ip_addresses
+
+
+@debug_log
+@runtime_monitor
+def process_yaml_file(file_path: str) -> List[str]:
+    """
+    Process a YAML file and extract a list of hosts.
+
+    Args:
+        file_path (str): The path to the YAML file.
+
+    Returns:
+        List[str]: A list of host names extracted from the YAML file.
+    """
+    with open(file_path, 'r', encoding="utf-8") as f:
+        inventory = yaml.safe_load(f.read())
+
+    ip_addresses = []
+    for host in inventory.get('hosts', []):
+        if host.get('host') and is_valid_ip_address(host['host']):
+            ip_addresses.append(host['host'])
+        elif host.get('ip') and is_valid_ip_address(host['ip']):
+            ip_addresses.append(host['ip'])
+    return ip_addresses
+
+
+@debug_log
+@runtime_monitor
+def process_subnet(subnet: str) -> List[str]:
+    """
+    Process a subnet and return a list of IP addresses within the subnet.
+
+    Args:
+        subnet (str): The subnet in CIDR notation.
+
+    Returns:
+        List[str]: A list of IP addresses within the subnet.
+
+    Raises:
+        InvalidInput: If the subnet format is invalid.
+    """
+    try:
+        # strict=False allows for a subnet mask to be specified
+        subnet_obj = ipaddress.IPv4Network(subnet, strict=False)
+        return [str(ip) for ip in subnet_obj.hosts()]
+    except ValueError as e:
+        raise InvalidInput("Invalid subnet format") from e
+
+
+@debug_log
+@runtime_monitor
+def process_ip_range(ip_range: str) -> List[str]:
+    """
+    Process an IP range and return a list of IP addresses. This range
+    can be in the format "<ip>-<ip>", "<ip>-<ip>, <ip>" or a
+    comma-separated list of IP addresses.
+
+    Args:
+        ip_range (str): The IP range in the format "<ip>-<ip>",
+        "<ip>-<ip>, <ip>" or a comma-separated list of IP addresses.
+
+    Returns:
+        List[str]: A list of summarized IP addresses.
+
+    Raises:
+        InvalidInput: If the IP range format is invalid.
+    """
+    ip_addresses = []
+
+    # Split by comma to handle individual IPs and ranges
+    parts = [part.strip() for part in ip_range.split(',')]
+
+    for part in parts:
+        if '-' in part:
+            # Handle ranges
+            try:
+                start_ip, end_ip = part.split('-')
+                start_ip_obj = ipaddress.IPv4Address(start_ip.strip())
+                # Check if end_ip is in short format
+                # (e.g., "192.168.0.1-3")
+                if '.' not in end_ip:
+                    # end_ip = start_ip[:start_ip.rfind('.') + 1] + end_ip
+                    end_ip = '.'.join(start_ip.split('.')[:-1] +
+                                      [end_ip.strip()])
+                    end_ip_obj = ipaddress.IPv4Address(end_ip)
+
+                    ip_addresses.extend(
+                        [str(ip) for ip in ipaddress.summarize_address_range(
+                            start_ip_obj, end_ip_obj)]
+                    )
+            except ValueError as e:
+                raise InvalidInput("Invalid IP range format") from e
+        else:
+            # Handle individual IPs
+            try:
+                ip_addresses.append(str(ipaddress.IPv4Address(part)))
+            except ValueError as e:
+                raise InvalidInput(f"Invalid IP address {part}") from e
+
+    return ip_addresses
+
+
+def is_valid_ip_address(ip_address: str) -> bool:
+    """
+    Check if a given string is a valid IP address.
+
+    Args:
+        ip_address (str): The string to be checked.
+
+    Returns:
+        bool: True if the string is a valid IP address, False otherwise.
+    """
+    try:
+        ipaddress.IPv4Address(ip_address)
+        return True
+    except ValueError:
+        return False
+
+
 @runtime_monitor
 def get_credentials() -> dict:
     """
@@ -733,140 +899,6 @@ def get_credentials() -> dict:
         LOGGER.debug("Password entered.")
 
     return {"username": username, "password": password}
-
-
-@debug_log
-@runtime_monitor
-def process_text_file(file_path: str) -> List[str]:
-    """
-    Reads a text file and returns a list of IP addresses.
-
-    Args:
-        file_path (str): The path to the text file.
-
-    Returns:
-        List[str]: A list of IP addresses read from the file.
-    """
-    with open(file_path, 'r', encoding="utf-8") as f:
-        ip_addresses = f.read().splitlines()
-    return ip_addresses
-
-
-@debug_log
-@runtime_monitor
-def process_yaml_file(file_path: str) -> List[str]:
-    """
-    Process a YAML file and extract a list of hosts.
-
-    Args:
-        file_path (str): The path to the YAML file.
-
-    Returns:
-        List[str]: A list of host names extracted from the YAML file.
-    """
-    with open(file_path, 'r', encoding="utf-8") as f:
-        inventory = yaml.safe_load(f.read())
-
-    ip_addresses = []
-    for host in inventory.get('hosts', []):
-        if host.get('host') and is_valid_ip_address(host['host']):
-            ip_addresses.append(host['host'])
-        elif host.get('ip') and is_valid_ip_address(host['ip']):
-            ip_addresses.append(host['ip'])
-    return ip_addresses
-
-
-@debug_log
-@runtime_monitor
-def is_valid_ip_address(ip_address: str) -> bool:
-    """
-    Check if a given string is a valid IP address.
-
-    Args:
-        ip_address (str): The string to be checked.
-
-    Returns:
-        bool: True if the string is a valid IP address, False otherwise.
-    """
-    try:
-        ipaddress.IPv4Address(ip_address)
-        return True
-    except ValueError:
-        return False
-
-
-@debug_log
-@runtime_monitor
-def process_file(file_path: str) -> List[str]:
-    """
-    Process the IP addresses from a file.
-
-    Args:
-        file_path (str): The path to the file.
-
-    Returns:
-        List[str]: A list of IP addresses extracted from the file.
-    """
-    LOGGER.info("Processing IP addresses from file: %s", file_path)
-    ip_addresses = []
-
-    if file_path.endswith('.txt') or file_path.endswith('.text'):
-        ip_addresses = process_text_file(file_path)
-    elif file_path.endswith('.yml') or file_path.endswith('.yaml'):
-        ip_addresses = process_yaml_file(file_path)
-    else:
-        LOGGER.error("Invalid file type. Exiting the script.")
-        safe_exit()
-
-    return ip_addresses
-
-
-@debug_log
-@runtime_monitor
-def process_subnet(subnet: str) -> List[str]:
-    """
-    Process a subnet and return a list of IP addresses within the subnet.
-
-    Args:
-        subnet (str): The subnet in CIDR notation.
-
-    Returns:
-        List[str]: A list of IP addresses within the subnet.
-
-    Raises:
-        InvalidInput: If the subnet format is invalid.
-    """
-    try:
-        # strict=False allows for a subnet mask to be specified
-        subnet_obj = ipaddress.IPv4Network(subnet, strict=False)
-        return [str(ip) for ip in subnet_obj.hosts()]
-    except ValueError as e:
-        raise InvalidInput("Invalid subnet format") from e
-
-
-@debug_log
-@runtime_monitor
-def process_ip_range(ip_range: str) -> List[str]:
-    """
-    Process an IP range and return a list of summarized IP addresses.
-
-    Args:
-        ip_range (str): The IP range in the format "start_ip-end_ip".
-
-    Returns:
-        List[str]: A list of summarized IP addresses.
-
-    Raises:
-        InvalidInput: If the IP range format is invalid.
-    """
-    try:
-        start_ip, end_ip = ip_range.split('-')
-        start_ip_obj = int(ipaddress.IPv4Address(start_ip.strip()))
-        end_ip_obj = int(ipaddress.IPv4Address(end_ip.strip()))
-        return [str(ipaddress.IPv4Address(ip))
-                for ip in range(start_ip_obj, end_ip_obj + 1)]
-    except ValueError as e:
-        raise InvalidInput("Invalid IP range format") from e
 
 
 def export_xml(mac_address_set: set[str]) -> None:
@@ -1024,8 +1056,7 @@ def safe_exit(
         # Get and log finishing time
         script_elapsed_time = time.perf_counter() - script_start_timer
         LOGGER.info('The script required %0.2f seconds to finish processing on'
-                    ' %d devices.', script_elapsed_time, device_counter
-                    )
+                    ' %d devices.', script_elapsed_time, device_counter)
         LOGGER.info("Script execution completed: %s",
                     datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
@@ -1039,7 +1070,6 @@ def safe_exit(
     sys.exit()
 
 
-@runtime_monitor
 def main() -> None:
     """
     Entry point of the script. Executes the main logic of the switch MAC
