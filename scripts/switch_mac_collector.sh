@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Navigate to the src directory
 cd "$(dirname "$0")"/..
 

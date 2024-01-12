@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Utility functions for the application."""
 from datetime import datetime
 import functools

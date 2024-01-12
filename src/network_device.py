@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Focuses on direct interactions with the network devices."""
 from netmiko import (ConnectHandler, NetmikoAuthenticationException,
                      NetmikoTimeoutException)

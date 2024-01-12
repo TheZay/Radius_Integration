@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Handles loading  and parsing the configuration file."""
 import json
 import os.path

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """This module contains custom exception classes for the script."""
 class ScriptExit(Exception):
     """

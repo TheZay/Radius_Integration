@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Switch MAC Collector Script
 

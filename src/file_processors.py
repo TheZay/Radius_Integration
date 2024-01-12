@@ -1,7 +1,8 @@
+#!/usr/bin/env python
 """This module contains functions to process files and extract IP
     addresses."""
 import argparse
-import ipaddress
+from ipaddress import IPv4Address, IPv4Network
 from typing import List
 import yaml
 
@@ -132,7 +133,7 @@ def process_subnet(subnet: str) -> List[str]:
     """
     try:
         # strict=False allows for a subnet mask to be specified
-        subnet_obj = ipaddress.IPv4Network(subnet, strict=False)
+        subnet_obj = IPv4Network(subnet, strict=False)
         return [str(ip) for ip in subnet_obj.hosts()]
     except ValueError as e:
         raise InvalidInput("Invalid subnet format") from e
@@ -166,25 +167,25 @@ def process_ip_range(ip_range: str) -> List[str]:
             # Handle ranges
             try:
                 start_ip, end_ip = part.split('-')
-                start_ip_obj = ipaddress.IPv4Address(start_ip.strip())
+                start_ip_obj = IPv4Address(start_ip.strip())
                 # Check if end_ip is in short format
                 # (e.g., "192.168.0.1-3")
                 if '.' not in end_ip:
                     # end_ip = start_ip[:start_ip.rfind('.') + 1] + end_ip
                     end_ip = '.'.join(start_ip.split('.')[:-1] +
                                       [end_ip.strip()])
-                    end_ip_obj = ipaddress.IPv4Address(end_ip)
+                end_ip_obj = IPv4Address(end_ip)
 
-                    ip_addresses.extend(
-                        [str(ip) for ip in ipaddress.summarize_address_range(
-                            start_ip_obj, end_ip_obj)]
-                    )
+                while start_ip_obj <= end_ip_obj:
+                    ip_addresses.append(str(start_ip_obj))
+                    start_ip_obj += 1
+
             except ValueError as e:
                 raise InvalidInput("Invalid IP range format") from e
         else:
             # Handle individual IPs
             try:
-                ip_addresses.append(str(ipaddress.IPv4Address(part)))
+                ip_addresses.append(str(IPv4Address(part)))
             except ValueError as e:
                 raise InvalidInput(f"Invalid IP address {part}") from e
 
@@ -202,7 +203,7 @@ def is_valid_ip_address(ip_address: str) -> bool:
         bool: True if the string is a valid IP address, False otherwise.
     """
     try:
-        ipaddress.IPv4Address(ip_address)
+        IPv4Address(ip_address)
         return True
     except ValueError:
         return False

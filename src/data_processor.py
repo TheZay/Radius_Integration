@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Houses the NetworkDataProcessor class for processing network data."""
 import re
 from typing import Callable

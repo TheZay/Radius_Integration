@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Manages multiple NetworkDevice instances."""
 from .logging_setup import LOGGER
 from .utilities import debug_log, runtime_monitor

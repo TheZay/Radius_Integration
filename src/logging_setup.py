@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Sets up the logging configurations."""
 import logging
 import logging.config
