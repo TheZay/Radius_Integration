@@ -146,8 +146,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# VSCode settings
+# User settings
 .vscode/
+*vscode/
+.idea/
+*idea/
 
 # Generated files
 *.xml
