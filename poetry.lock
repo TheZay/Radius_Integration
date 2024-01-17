@@ -160,6 +160,17 @@ files = [
 ]
 
 [[package]]
+name = "ipaddress"
+version = "1.0.23"
+description = "IPv4/IPv6 manipulation library"
+optional = false
+python-versions = "*"
+files = [
+    {file = "ipaddress-1.0.23-py2.py3-none-any.whl", hash = "sha256:6e0f4a39e66cb5bb9a137b00276a2eff74f93b71dcbdad6f10ff7df9d3557fcc"},
+    {file = "ipaddress-1.0.23.tar.gz", hash = "sha256:b7f8e0369580bb4a24d5ba1d7cc29660a4a6987763faf1d8a8046830e020e7e2"},
+]
+
+[[package]]
 name = "netmiko"
 version = "4.3.0"
 description = "Multi-vendor library to simplify legacy CLI connections to network devices"
@@ -366,4 +377,4 @@ six = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "f8f0ab4d377e39291c5a41c81ce2179b6d7f36dc84a6f87a271e965536813bc7"
+content-hash = "5afbbcd3491c6aa87fcc9e769c3769813435dfa1df9e8451b3ca138123171837"
