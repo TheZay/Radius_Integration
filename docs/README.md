@@ -1,7 +1,7 @@
 # Switch MAC Collector Script
 
-**Author:** Noah Isaac Keller  
-**Maintainer:** Noah Isaac Keller  
+**Author:** Noah Keller  
+**Maintainer:** Noah Keller  
 **Email:** <nkeller@choctawnation.com>
 
 Welcome to the **Switch MAC Collector Script**, a specialized tool developed to address the real-world needs of network engineers. Born out of the necessity to automate the manual and time-intensive task of fetching MAC addresses from switches, this script is a cornerstone of our Radius Integration project.

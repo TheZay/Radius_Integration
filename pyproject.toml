@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "macollector"
+version = "1.2.0"
+description = "Python-based tool developed to streamline the collection of MAC addresses from Cisco network switches."
+authors = ["Noah Keller <nkeller@choctawnation.com>"]
+license = "GPL-3.0-or-later"
+readme = "docs\\README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+netmiko = "^4.3.0"
+PyYAML = "^6.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
