@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 """Houses the NetworkDataProcessor class for processing network data."""
+import logging
 import re
 from typing import Callable
-
 from .utilities import debug_log, runtime_monitor
-from .logging_setup import LOGGER
+
+# Global logger variable
+logger = logging.getLogger('macollector')
 
 
 class NetworkDataProcessor:
@@ -26,10 +28,10 @@ class NetworkDataProcessor:
             None
         """
 
-        LOGGER.debug("VLAN extraction in progress")
+        logger.debug("VLAN extraction in progress")
         voip_vlans = NetworkDataProcessor.extract_voip_vlans(vlan_data)
         ap_vlans = NetworkDataProcessor.extract_ap_vlans(vlan_data)
-        LOGGER.debug("VLAN extraction completed.")
+        logger.debug("VLAN extraction completed.")
         return voip_vlans + ap_vlans
 
     @staticmethod
@@ -58,7 +60,7 @@ class NetworkDataProcessor:
             ):
                 voip_vlans.append(int(vlan_info['vlan_id']))
 
-        LOGGER.debug("Discovered VoIP VLANs: %s", voip_vlans)
+        logger.debug("Discovered VoIP VLANs: %s", voip_vlans)
         return voip_vlans
 
     @staticmethod
@@ -87,7 +89,7 @@ class NetworkDataProcessor:
             ):
                 ap_vlans.append(int(vlan_info['vlan_id']))
 
-        LOGGER.debug("Discovered AP VLANs: %s", ap_vlans)
+        logger.debug("Discovered AP VLANs: %s", ap_vlans)
         return ap_vlans
 
     @staticmethod
@@ -143,7 +145,7 @@ class NetworkDataProcessor:
                         not po_pattern.match(interface) and
                         mac_address and
                         NetworkDataProcessor.is_valid_mac_address(mac_address)):
-                    LOGGER.debug("Discovered %s on %s.",
+                    logger.debug("Discovered %s on %s.",
                                  mac_address, interface)
                     mac_addresses.add(mac_address)
 

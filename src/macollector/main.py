@@ -67,7 +67,7 @@ import msvcrt
 import time
 from datetime import datetime
 
-from .logging_setup import LOGGER, setup_logging
+from .logging_setup import setup_logging
 from .exceptions import InvalidInput, ScriptExit
 from .device_manager import DeviceManager
 from .exporters import export_xml
@@ -112,7 +112,7 @@ def parse_args(config: dict) -> argparse.Namespace:
     return parser.parse_args()
 
 
-def get_credentials() -> dict:
+def get_credentials(logger) -> dict:
     """
     Prompts the user to enter their username and password and returns
         them as a dictionary.
@@ -122,11 +122,11 @@ def get_credentials() -> dict:
             user.
     """
     username = input("Username: ")
-    LOGGER.debug("Username entered: %s", username)
+    logger.debug("Username entered: %s", username)
 
     try:
         # For Windows
-        LOGGER.debug("Prompting user for password.")
+        logger.debug("Prompting user for password.")
         password = ""
         print("Password: ", end="", flush=True)
         while True:
@@ -137,12 +137,12 @@ def get_credentials() -> dict:
             print(" ", end="", flush=True)
     except ImportError:
         # For Unix-like systems
-        LOGGER.exception("Failed to import msvcrt module,"
+        logger.exception("Failed to import msvcrt module,"
                          " falling back to getpass.")
         password = getpass.getpass()
     finally:
         print()
-        LOGGER.debug("Password entered.")
+        logger.debug("Password entered.")
 
     return {"username": username, "password": password}
 
@@ -161,29 +161,35 @@ def main() -> None:
     """
     config = load_config()
     args = parse_args(config)
-    setup_logging(args.log_file_path, args.log_level)
+    logger, listener = setup_logging(args.log_file_path, args.log_level)
 
     current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    LOGGER.info("Script execution started: %s", current_time)
+    logger.info("Script execution started: %s", current_time)
     time.sleep(0.25)  # LOGGER delay
 
     script_start_timer = time.perf_counter()
     ip_addresses = []
     try:
         ip_addresses = validate_input(args)
-        LOGGER.info("IP addresses to process: %s", ip_addresses)
-        credentials = get_credentials()
-        device_manager = DeviceManager(credentials, ip_addresses)
+        logger.info("IP addresses to process: %s", ip_addresses)
+        credentials = get_credentials(logger)
+        device_manager = DeviceManager(
+            credentials, ip_addresses, config.get('max_threads', None))
         device_manager.process_all_devices()
         export_xml(device_manager.mac_addresses)
     except InvalidInput as e:
-        LOGGER.error("Invalid input: %s", e)
+        logger.error("Invalid input: %s", e)
     except ScriptExit as e:
-        LOGGER.error("Script exited: %s", e)
+        logger.error("Script exited: %s", e)
     except KeyboardInterrupt:
-        LOGGER.error("Keyboard interrupt detected. Exiting the script.")
+        logger.error("Keyboard interrupt detected. Exiting the script.")
     finally:
-        safe_exit(script_start_timer, len(ip_addresses), args.log_file_path)
+        safe_exit(
+            len(ip_addresses),
+            listener,
+            args.log_file_path,
+            script_start_timer
+        )
 
 
 if __name__ == '__main__':

@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 """Focuses on direct interactions with the network devices."""
+import logging
 from netmiko import (ConnectHandler, NetmikoAuthenticationException,
                      NetmikoTimeoutException)
 from paramiko.ssh_exception import SSHException
-
 from .data_processor import NetworkDataProcessor
 from .utilities import debug_log, runtime_monitor
-from .logging_setup import LOGGER
+
+# Global logger variable
+logger = logging.getLogger('macollector')
 
 
 class NetworkDevice:
@@ -81,16 +83,16 @@ class NetworkDevice:
             )
             self.connection.enable()
             self.hostname = self.connection.find_prompt().strip('#>')
-            LOGGER.info("Connected to %s (%s)",
+            logger.info("Connected to %s (%s)",
                         self.hostname, self.ip_address)
         except NetmikoTimeoutException as e:
-            LOGGER.error("Timeout when connecting to %s: %s",
+            logger.error("Timeout when connecting to %s: %s",
                          self.ip_address, e)
         except NetmikoAuthenticationException as e:
-            LOGGER.error("Authentication failed when connecting to %s: %s",
+            logger.error("Authentication failed when connecting to %s: %s",
                          self.ip_address, e)
         except SSHException as e:
-            LOGGER.error("Failed to retrieve the hostname for %s: %s",
+            logger.error("Failed to retrieve the hostname for %s: %s",
                          self.ip_address, e)
 
     @debug_log
@@ -104,7 +106,7 @@ class NetworkDevice:
         """
         if self.connection:
             self.connection.disconnect()
-            LOGGER.info("Disconnected from %s (%s)",
+            logger.info("Disconnected from %s (%s)",
                         self.hostname, self.ip_address)
 
     @debug_log
@@ -123,16 +125,16 @@ class NetworkDevice:
                         of the command.
         """
         if not self.connection:
-            LOGGER.error("Not connected to device %s",
+            logger.error("Not connected to device %s",
                          self.ip_address)
             return [{None: None}]
 
-        LOGGER.info('Executing command "%s" on %s (%s)',
+        logger.info('Executing command "%s" on %s (%s)',
                     command, self.hostname, self.ip_address)
         try:
             output = self.connection.send_command(command, use_textfsm=fsm)
         except Exception as e:
-            LOGGER.error("Error executing %s on %s: %s",
+            logger.error("Error executing %s on %s: %s",
                          command, self.ip_address, e)
             output = [{'Error': e}]
 
@@ -156,7 +158,7 @@ class NetworkDevice:
         Returns:
             list: A list of MAC addresses collected from the device.
         """
-        LOGGER.info("Processing %s (%s)",
+        logger.info("Processing %s (%s)",
                     self.hostname, self.ip_address)
         try:
             self.connect()
@@ -166,6 +168,6 @@ class NetworkDevice:
                 vlan_ids, self.execute_command)
         finally:
             self.disconnect()
-        LOGGER.info("Finished processing %s (%s)",
+        logger.info("Finished processing %s (%s)",
                     self.hostname, self.ip_address)
         return mac_addresses

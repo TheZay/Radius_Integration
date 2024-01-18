@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 """This module contains functions to process files and extract IP
     addresses."""
+import logging
 import argparse
 from ipaddress import IPv4Address, IPv4Network
 from typing import List
 import yaml
-
 from .exceptions import InvalidInput
-from .logging_setup import LOGGER
 from .utilities import debug_log, runtime_monitor, safe_exit
+
+# Global logger variable
+logger = logging.getLogger('macollector')
 
 
 @debug_log
@@ -54,7 +56,7 @@ def process_file(file_path: str) -> List[str]:
     Returns:
         List[str]: A list of IP addresses extracted from the file.
     """
-    LOGGER.info("Processing IP addresses from file: %s", file_path)
+    logger.info("Processing IP addresses from file: %s", file_path)
 
     ip_addresses = []
     if file_path.endswith('.txt') or file_path.endswith('.text'):
@@ -62,7 +64,7 @@ def process_file(file_path: str) -> List[str]:
     elif file_path.endswith('.yml') or file_path.endswith('.yaml'):
         ip_addresses = process_yaml_file(file_path)
     else:
-        LOGGER.error("Invalid file type. Exiting the script.")
+        logger.error("Invalid file type. Exiting the script.")
         safe_exit()
 
     return ip_addresses
@@ -87,7 +89,7 @@ def process_text_file(file_path: str) -> List[str]:
             if is_valid_ip_address(ip):
                 ip_addresses.append(ip)
             else:
-                LOGGER.warning('Skipped invalid IP address (%s) found in file '
+                logger.warning('Skipped invalid IP address (%s) found in file '
                                '(%s).', ip, file_path)
     return ip_addresses
 
