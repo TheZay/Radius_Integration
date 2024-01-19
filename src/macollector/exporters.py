@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 """Functions for exporting data to various formats."""
+import logging
 import os.path
 from datetime import datetime, timezone
 from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-from .logging_setup import LOGGER
+# Global logger variable
+logger = logging.getLogger('macollector')
 
 
 def export_xml(mac_address_set: set[str]) -> None:
@@ -19,7 +21,7 @@ def export_xml(mac_address_set: set[str]) -> None:
         None
     """
     root = create_xml_structure(mac_address_set)
-    LOGGER.debug('Generated XML structure')
+    logger.debug('Generated XML structure')
 
     xml_string = create_formatted_xml(root)
     save_formatted_xml(xml_string)
@@ -35,13 +37,13 @@ def create_xml_structure(mac_address_set: set[str]) -> Element:
     Returns:
         ET.Element: The root element of the XML structure.
     """
-    LOGGER.info("Creating XML structure for %d MAC addresses.",
+    logger.info("Creating XML structure for %d MAC addresses.",
                 len(mac_address_set))
     static_host_list_name = input('Specify static host list name: ')
-    LOGGER.debug('Static host list name: %s',
+    logger.debug('Static host list name: %s',
                  static_host_list_name)
     static_host_list_desc = input('Specify static host list description: ')
-    LOGGER.debug('Static host list description: %s',
+    logger.debug('Static host list description: %s',
                  static_host_list_desc)
 
     root = Element(
@@ -118,7 +120,7 @@ def save_formatted_xml(xml_string: str) -> None:
         None
     """
     # Debug: Print the XML string before writing to the file
-    LOGGER.debug('Saving XML to file')
+    logger.debug('Saving XML to file')
     output_file_name = f'smc_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xml'
     with open(f'data\\{output_file_name}', 'wb') as xml_file:
         xml_file.write(xml_string.encode())

@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 """Manages multiple NetworkDevice instances."""
-from .logging_setup import LOGGER
+import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from .utilities import debug_log, runtime_monitor
 from .network_device import NetworkDevice
+
+# Global logger variable
+logger = logging.getLogger('macollector')
 
 
 class DeviceManager:
@@ -31,7 +35,7 @@ class DeviceManager:
     """
 
 
-    def __init__(self, credentials, device_list) -> None:
+    def __init__(self, credentials, device_list, max_threads: int = 10) -> None:
         """
         Initializes the DeviceManager object.
 
@@ -42,6 +46,7 @@ class DeviceManager:
                                 devices.
         """
         self.devices = [NetworkDevice(ip, credentials) for ip in device_list]
+        self.max_threads = max_threads
         self.mac_addresses = set()
         self.failed_devices = []
 
@@ -58,11 +63,17 @@ class DeviceManager:
             failed device.
 
         """
-        for device in self.devices:
+        with ThreadPoolExecutor(max_workers=self.max_threads) as tpe:
+            # Create a future for each device's process_device method
+            future_to_device = {tpe.submit(device.process_device):
+                                device for device in self.devices}
+
+        for future in as_completed(future_to_device):
+            device = future_to_device[future]
             try:
-                mac_addresses = device.process_device()
+                mac_addresses = future.result()
                 self.mac_addresses.update(mac_addresses)
             except Exception as e:
-                LOGGER.error("Error processing device %s: %s",
+                logger.error("Error processing device %s: %s",
                              device.ip_address, str(e))
                 self.failed_devices.append(device.ip_address)

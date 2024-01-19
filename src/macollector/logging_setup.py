@@ -2,13 +2,11 @@
 """Sets up the logging configurations."""
 import logging
 import logging.config
-from logging.handlers import RotatingFileHandler
-
-# Global variables
-LOGGER = logging.getLogger(__name__)
+from logging.handlers import RotatingFileHandler, QueueListener
+from queue import Queue
 
 
-def setup_logging(log_file_path: str, log_level: str):
+def setup_logging(log_file_path: str, log_level: str = 'INFO'):
     """
     Set up logging configuration.
 
@@ -19,6 +17,11 @@ def setup_logging(log_file_path: str, log_level: str):
     Returns:
         None
     """
+    # Create a logger
+    logger = logging.getLogger('macollector')
+    logger.setLevel(logging.DEBUG)
+    logger.handlers.clear()
+
     # Create file handler for logging
     file_handler = RotatingFileHandler(
         log_file_path,
@@ -27,23 +30,32 @@ def setup_logging(log_file_path: str, log_level: str):
     )
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(logging.Formatter(
-        '[%(levelname)-5s][%(asctime)s][%(process)d] %(message)s',
+        '[%(levelname)-5s][%(asctime)s][%(threadName)s] %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     ))
 
     # Create console handler for logging
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(log_level.upper())
+    console_handler.setLevel(logging.getLevelName(log_level.upper()))
     console_handler.setFormatter(logging.Formatter(
         '[%(levelname)-5s] %(message)s'))
 
-    # Add handlers to the logger
-    LOGGER.addHandler(file_handler)
-    LOGGER.addHandler(console_handler)
-    LOGGER.setLevel(logging.DEBUG)
+    # Add handlers directly to the logger
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
+    # Set up a log queue for handling logs asynchronously
+    log_queue = Queue(-1)
+    listener = QueueListener(
+        log_queue, file_handler, console_handler, respect_handler_level=True)
+
+    # Start the queue listener
+    listener.start()
 
     if log_level != 'INFO':
-        LOGGER.log(logging.INFO, 'Log level set to %s', log_level)
+        logger.log(logging.INFO, 'Log level set to %s', log_level)
+
+    return logger, listener
 
 
 def add_separator_to_log(log_file_path: str, separator: str = '-' * 80):
