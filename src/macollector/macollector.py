@@ -1,60 +1,14 @@
 #!/usr/bin/env python
 """
-Switch MAC Collector Script
+macollector.py: Switch MAC Collector Script.
 
-Author: Noah Isaac Keller
-Maintainer: Noah Isaac Keller
-Email: nkeller@choctawnation.com
+This script, designed by Noah Keller, is purposed to collect MAC addresses
+from a network of devices. It supports reading IP addresses from files, processing
+individual IPs, IP ranges, and subnets. The script leverages Netmiko for SSH
+connections to Cisco IOS devices and exports collected MAC addresses to an XML
+file.
 
-This script is designed to collect MAC addresses from a collection of
-network devices. It supports various input methods, including reading IP
-addresses from a text file, processing individual IP addresses,
-specifying IP address ranges, and defining subnets to scan.
-
-The script uses Netmiko for SSH connections to network devices and
-retrieves MAC addresses from the MAC address tables of VLANs configured
-on the devices. It supports Cisco IOS devices.
-
-The collected MAC addresses are then exported to an XML file in a
-specific format that can be used for network configuration management.
-
-To run the script, you can specify various command-line arguments, such
-as the input method, log file path, and log level.
-
-For more details on usage and available options, please refer to the
-command-line help:
-
-Usage:
-  python switch_mac_collector.py [
-    -f FILE
-    -i IP
-    -r IP_RANGE
-    -s SUBNET
-    --log-file-path LOG_FILE_PATH
-    --log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
-  ]
-
-Options:
-  -f FILE, --file FILE              Text file containing IP addresses
-                                    to process.
-  -i IP, --ip IP                    Single IP address to process.
-  -r IP_RANGE, --ip-range IP_RANGE  IP address range to process.
-                                    (e.g., 10.1.1.0-10.1.1.127)
-  -s SUBNET, --subnet SUBNET        Subnet range to process.
-                                    (e.g., 10.1.1.0/24)
-  --log-file-path LOG_FILE_PATH     Log file path
-                                    (default: config.json).
-  --log-level {DEBUG,INFO,WARNING,ERROR,CRITICAL}
-                                    Log level (default: INFO).
-
-The script can be configured using the 'config.json' file, which
-contains parameters like the log file path and logging level.
-
-Please make sure to install the required dependencies listed in the
-script's import statements before running the script.
-
-For any questions or issues, please contact the script author,
-Noah Isaac Keller, at nkeller@choctawnation.com.
+Usage and command-line arguments are detailed in the script's help section.
 """
 
 __author__ = 'Noah Keller'
@@ -63,28 +17,28 @@ __email__ = 'nkeller@choctawnation.com'
 
 import argparse
 import getpass
-import msvcrt
+import msvcrt  # Windows only
 import time
 from datetime import datetime
 
-from .logging_setup import setup_logging
-from .exceptions import InvalidInput, ScriptExit
-from .device_manager import DeviceManager
-from .exporters import export_xml
+# Local imports
 from .config_manager import load_config
+from .device_manager import DeviceManager
+from .exceptions import InvalidInput, ScriptExit
+from .exporters import export_xml
 from .file_processors import validate_input
+from .logging_setup import setup_logging
 from .utilities import safe_exit
 
 
 def parse_args(config: dict) -> argparse.Namespace:
     """
-    Parse command line arguments.
+    Parse command line arguments for the script.
 
-    Args:
-        config (dict): Configuration dictionary.
-
-    Returns:
-        argparse.Namespace: Parsed command line arguments.
+    :param config: Configuration dictionary loaded from a JSON file.
+    :type config: dict
+    :return: Parsed command line arguments.
+    :rtype: argparse.Namespace
     """
     parser = argparse.ArgumentParser(description='Switch MAC Collector Script')
 
@@ -114,12 +68,11 @@ def parse_args(config: dict) -> argparse.Namespace:
 
 def get_credentials(logger) -> dict:
     """
-    Prompts the user to enter their username and password and returns
-        them as a dictionary.
+    Prompt user for username and password.
 
-    Returns:
-        A dictionary containing the username and password entered by the
-            user.
+    :param logger: Logger instance for logging debug messages.
+    :return: User credentials as a dictionary.
+    :rtype: dict
     """
     username = input("Username: ")
     logger.debug("Username entered: %s", username)
@@ -149,15 +102,14 @@ def get_credentials(logger) -> dict:
 
 def main() -> None:
     """
-    Entry point of the script. Executes the main logic of the switch MAC
-        collector.
+    Main function executing the script logic.
 
-    Raises:
-        InvalidInput: If the input arguments are invalid.
-        ScriptExit: If the script encounters an error and needs to exit.
-        KeyboardInterrupt: If the script is interrupted by a keyboard
-                            interrupt.
+    Loads configuration, parses arguments, and orchestrates the MAC address
+    collection and export process. Handles exceptions and ensures clean exit.
 
+    :raises InvalidInput: If the input arguments are invalid.
+    :raises ScriptExit: If the script needs to exit prematurely.
+    :raises KeyboardInterrupt: If the script is interrupted by the user.
     """
     config = load_config()
     args = parse_args(config)

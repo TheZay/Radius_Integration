@@ -1,20 +1,23 @@
 #!/usr/bin/env python
-import unittest
-from unittest.mock import patch, MagicMock
 import time
-from src.utilities import debug_log, runtime_monitor, safe_exit
+import unittest
+from unittest.mock import MagicMock, patch
+
+from src.macollector.utilities import debug_log, runtime_monitor, safe_exit
+
 
 class TestUtilityFunctions(unittest.TestCase):
     """Test cases for utility functions."""
 
-    @patch('src.utilities.LOGGER')
+    @patch('src.macollector.utilities.logger')
     def test_debug_log_decorator(self, mock_logger):
         """Test the debug_log decorator."""
+
         @debug_log
         def dummy_function(x, y):
             return x + y
 
-        #pylint: disable=unused-variable
+        # pylint: disable=unused-variable
         result = dummy_function(5, 3)
 
         # Ensure that LOGGER.debug was called twice
@@ -34,15 +37,16 @@ class TestUtilityFunctions(unittest.TestCase):
         self.assertIn('dummy_function() returned', second_call_message)
         self.assertIn('8', second_call_message)
 
-    @patch('src.utilities.LOGGER')
+    @patch('src.macollector.utilities.logger')
     def test_runtime_monitor_decorator(self, mock_logger):
         """Test the runtime_monitor decorator."""
+
         @runtime_monitor
         def dummy_function(duration):
             time.sleep(duration)
             return duration
 
-        #pylint: disable=unused-variable
+        # pylint: disable=unused-variable
         result = dummy_function(1)
 
         # Check that LOGGER.debug was called
@@ -57,7 +61,7 @@ class TestUtilityFunctions(unittest.TestCase):
         self.assertAlmostEqual(elapsed_time, 1.0, places=2)
         self.assertIn('%s() executed in %0.2f seconds.', call_format_str)
 
-    @patch('src.utilities.LOGGER')
+    @patch('src.macollector.utilities.logger')
     def test_safe_exit_function(self, mock_logger):
         """Test the safe_exit function."""
         with patch('sys.exit', MagicMock()) as mock_exit:

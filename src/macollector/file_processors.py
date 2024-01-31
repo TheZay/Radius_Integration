@@ -1,15 +1,28 @@
 #!/usr/bin/env python
-"""This module contains functions to process files and extract IP
-    addresses."""
-import logging
+"""
+file_processors.py: Process files and extract IP addresses.
+
+This module contains functions for processing different types of files to
+extract IP addresses. It handles text files, YAML files, and subnets, and
+also validates input IP addresses.
+
+Functions include reading text and YAML files, processing subnets and IP ranges,
+and validating IP addresses.
+"""
+
 import argparse
-from ipaddress import IPv4Address, IPv4Network
+import logging
+import os.path
 from typing import List
+
 import yaml
-from .exceptions import InvalidInput
+from ipaddress import IPv4Address, IPv4Network
+
+# Local imports
+from .exceptions import InvalidInput, ScriptExit
 from .utilities import debug_log, runtime_monitor, safe_exit
 
-# Global logger variable
+# Shared logger
 logger = logging.getLogger('macollector')
 
 
@@ -17,16 +30,17 @@ logger = logging.getLogger('macollector')
 @runtime_monitor
 def validate_input(args: argparse.Namespace) -> List[str]:
     """
-    Validates the input arguments and returns a list of IP addresses.
+    Validate command-line arguments and return IP addresses.
 
-    Args:
-        args (argparse.Namespace): The parsed command-line arguments.
+    Parses provided command-line arguments to extract IP addresses.
+    It supports reading from a file, individual IP addresses, IP ranges,
+    and subnets. If no valid IP addresses are found, raises InvalidInput.
 
-    Returns:
-        List[str]: A list of validated IP addresses.
-
-    Raises:
-        InvalidInput: If no valid IP addresses are provided.
+    :param args: Parsed command-line arguments.
+    :type args: argparse.Namespace
+    :raises InvalidInput: If no valid IP addresses are provided.
+    :return: List of validated IP addresses.
+    :rtype: List[str]
     """
     ip_addresses = []
     if args.file:
@@ -48,14 +62,19 @@ def validate_input(args: argparse.Namespace) -> List[str]:
 @runtime_monitor
 def process_file(file_path: str) -> List[str]:
     """
-    Process the IP addresses from a file.
+    Process IP addresses from a specified file.
 
-    Args:
-        file_path (str): The path to the file.
+    Reads IP addresses from a text or YAML file. Supported file extensions are
+    .txt, .text, .yml, and .yaml. Other file types will trigger an error.
 
-    Returns:
-        List[str]: A list of IP addresses extracted from the file.
+    :param file_path: Path to the file containing IP addresses.
+    :type file_path: str
+    :return: List of IP addresses extracted from the file.
+    :rtype: List[str]
     """
+    if not os.path.isfile(file_path):
+        raise ScriptExit("File not found.")
+
     logger.info("Processing IP addresses from file: %s", file_path)
 
     ip_addresses = []
@@ -74,13 +93,15 @@ def process_file(file_path: str) -> List[str]:
 @runtime_monitor
 def process_text_file(file_path: str) -> List[str]:
     """
-    Reads a text file and returns a list of IP addresses.
+    Read a text file and return a list of IP addresses.
 
-    Args:
-        file_path (str): The path to the text file.
+    Opens a text file and reads each line to extract valid IP addresses.
+    Invalid IPs are logged and skipped. Only supports .txt and .text files.
 
-    Returns:
-        List[str]: A list of IP addresses read from the file.
+    :param file_path: Path to the text file.
+    :type file_path: str
+    :return: List of IP addresses read from the file.
+    :rtype: List[str]
     """
     ip_addresses = []
     with open(file_path, 'r', encoding="utf-8") as file:
@@ -98,13 +119,16 @@ def process_text_file(file_path: str) -> List[str]:
 @runtime_monitor
 def process_yaml_file(file_path: str) -> List[str]:
     """
-    Process a YAML file and extract a list of hosts.
+    Process a YAML file and extract a list of IP addresses.
 
-    Args:
-        file_path (str): The path to the YAML file.
+    Reads a YAML file to extract IP addresses defined under 'hosts'.
+    Supports .yml and .yaml file extensions. Each host entry can have either
+    'host' or 'ip' keys containing the IP address.
 
-    Returns:
-        List[str]: A list of host names extracted from the YAML file.
+    :param file_path: Path to the YAML file.
+    :type file_path: str
+    :return: List of IP addresses extracted from the YAML file.
+    :rtype: List[str]
     """
     with open(file_path, 'r', encoding="utf-8") as f:
         inventory = yaml.safe_load(f.read())
@@ -122,16 +146,16 @@ def process_yaml_file(file_path: str) -> List[str]:
 @runtime_monitor
 def process_subnet(subnet: str) -> List[str]:
     """
-    Process a subnet and return a list of IP addresses within the subnet.
+    Process a subnet and return a list of IP addresses within it.
 
-    Args:
-        subnet (str): The subnet in CIDR notation.
+    Parses a subnet in CIDR notation and generates a list of all host IP
+    addresses within that subnet. Handles both IPv4 and IPv6 subnets.
 
-    Returns:
-        List[str]: A list of IP addresses within the subnet.
-
-    Raises:
-        InvalidInput: If the subnet format is invalid.
+    :param subnet: The subnet in CIDR notation.
+    :type subnet: str
+    :raises InvalidInput: If the subnet format is invalid.
+    :return: A list of IP addresses within the subnet.
+    :rtype: List[str]
     """
     try:
         # strict=False allows for a subnet mask to be specified
@@ -145,19 +169,17 @@ def process_subnet(subnet: str) -> List[str]:
 @runtime_monitor
 def process_ip_range(ip_range: str) -> List[str]:
     """
-    Process an IP range and return a list of IP addresses. This range
-    can be in the format "<ip>-<ip>", "<ip>-<ip>, <ip>" or a
-    comma-separated list of IP addresses.
+    Process an IP range and return a list of IP addresses.
 
-    Args:
-        ip_range (str): The IP range in the format "<ip>-<ip>",
-        "<ip>-<ip>, <ip>" or a comma-separated list of IP addresses.
+    Handles IP ranges in various formats, including "start_ip-end_ip",
+    "start_ip-end_ip, additional_ip", or a comma-separated list of IPs.
+    Supports both continuous ranges and individual IP addresses.
 
-    Returns:
-        List[str]: A list of summarized IP addresses.
-
-    Raises:
-        InvalidInput: If the IP range format is invalid.
+    :param ip_range: The IP range in various formats.
+    :type ip_range: str
+    :raises InvalidInput: If the IP range format is invalid.
+    :return: A list of individual IP addresses derived from the range.
+    :rtype: List[str]
     """
     ip_addresses = []
 
@@ -196,13 +218,15 @@ def process_ip_range(ip_range: str) -> List[str]:
 
 def is_valid_ip_address(ip_address: str) -> bool:
     """
-    Check if a given string is a valid IP address.
+    Check if a string is a valid IPv4 address.
 
-    Args:
-        ip_address (str): The string to be checked.
+    Validates the provided string to determine if it represents a valid IPv4
+    address.
 
-    Returns:
-        bool: True if the string is a valid IP address, False otherwise.
+    :param ip_address: The string to be validated.
+    :type ip_address: str
+    :return: True if valid, False otherwise.
+    :rtype: bool
     """
     try:
         IPv4Address(ip_address)

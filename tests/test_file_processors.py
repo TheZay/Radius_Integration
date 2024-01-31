@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 import unittest
-from src.file_processors import process_ip_range, InvalidInput
+
+from src.macollector.file_processors import InvalidInput, process_ip_range
+
 
 class TestFileProcessors(unittest.TestCase):
     """
     This test case verifies the functionality of the
     NetworkDataProcessor class.
     """
+
     def test_process_ip_range_single_ip(self):
         """
         Test case for the process_ip_range function when given a single
@@ -104,6 +107,7 @@ class TestFileProcessors(unittest.TestCase):
         ip_range = "192.168.1.1, 192.168.1.256"
         with self.assertRaises(InvalidInput):
             process_ip_range(ip_range)
+
 
 if __name__ == '__main__':
     unittest.main()

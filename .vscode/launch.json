@@ -10,8 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "justMyCode": true,
-            "args": ["-i", "10.201.16.76"]
+            "justMyCode": true
         }
     ]
 }

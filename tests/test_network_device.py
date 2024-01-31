@@ -13,7 +13,9 @@ The `TestNetworkDevice` class tests the following:
 """
 import unittest
 from unittest.mock import MagicMock, patch
-from src.network_device import NetworkDevice
+
+from src.macollector.network_device import NetworkDevice
+
 
 class TestNetworkDevice(unittest.TestCase):
     """
@@ -31,6 +33,7 @@ class TestNetworkDevice(unittest.TestCase):
         network_device (NetworkDevice): The NetworkDevice instance under
             test.
     """
+
     def setUp(self):
         """
         Set up the test environment before each test case.
@@ -52,7 +55,7 @@ class TestNetworkDevice(unittest.TestCase):
         device type. It also checks that the hostname of the connected
         device is correctly set.
         """
-        with patch('src.network_device.ConnectHandler') as mock_connect_handler:
+        with patch('src.macollector.network_device.ConnectHandler') as mock_connect_handler:
             mock_connection = MagicMock()
             mock_connect_handler.return_value = mock_connection
             mock_connection.find_prompt.return_value = 'Switch'
@@ -75,7 +78,7 @@ class TestNetworkDevice(unittest.TestCase):
         It mocks the ConnectHandler class and asserts that the
         disconnect method is called once on the mock connection object.
         """
-        with patch('src.network_device.ConnectHandler') as mock_connect_handler:
+        with patch('src.macollector.network_device.ConnectHandler') as mock_connect_handler:
             mock_connection = MagicMock()
             mock_connect_handler.return_value = mock_connection
 
@@ -92,7 +95,7 @@ class TestNetworkDevice(unittest.TestCase):
         simulate a successful connection. The mock connection is then
         used to execute a command and the output is asserted.
         """
-        with patch('src.network_device.ConnectHandler') as mock_connect_handler:
+        with patch('src.macollector.network_device.ConnectHandler') as mock_connect_handler:
             mock_connection = MagicMock()
             mock_connect_handler.return_value = mock_connection
             mock_connection.send_command.return_value = 'command output'
@@ -103,6 +106,7 @@ class TestNetworkDevice(unittest.TestCase):
             mock_connection.send_command.assert_called_once_with(
                 'show version', use_textfsm=True)
             self.assertEqual(output, [{'output': 'command output'}])
+
 
 if __name__ == '__main__':
     unittest.main()

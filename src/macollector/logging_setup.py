@@ -1,21 +1,36 @@
 #!/usr/bin/env python
-"""Sets up the logging configurations."""
+"""
+logging_setup.py: Configure logging for the application.
+
+This module configures the logging for the application. It sets up file
+and console log handlers, a logging queue for asynchronous logging, and
+formats the log messages. It supports setting different log levels and
+rotates log files when they reach a certain size.
+
+The module provides a `setup_logging` function to initialize logging and
+`add_separator_to_log` to add separators in log files for better readability.
+"""
+
 import logging
 import logging.config
-from logging.handlers import RotatingFileHandler, QueueListener
+from logging.handlers import QueueListener, RotatingFileHandler
 from queue import Queue
 
 
 def setup_logging(log_file_path: str, log_level: str = 'INFO'):
     """
-    Set up logging configuration.
+    Initialize logging with file and console handlers.
 
-    Args:
-        log_file_path (str): The path to the log file.
-        log_level (str): The desired log level.
+    Sets up logging with both file and console handlers. Log messages are
+    formatted and logged asynchronously. Supports log rotation and different
+    log levels.
 
-    Returns:
-        None
+    :param log_file_path: Path to the log file.
+    :type log_file_path: str
+    :param log_level: Logging level ('DEBUG', 'INFO', etc.). Defaults to 'INFO'.
+    :type log_level: str
+    :return: Tuple containing the logger and the queue listener.
+    :rtype: tuple
     """
     # Create a logger
     logger = logging.getLogger('macollector')
@@ -47,7 +62,10 @@ def setup_logging(log_file_path: str, log_level: str = 'INFO'):
     # Set up a log queue for handling logs asynchronously
     log_queue = Queue(-1)
     listener = QueueListener(
-        log_queue, file_handler, console_handler, respect_handler_level=True)
+        log_queue,  # Queue
+        file_handler, console_handler,  # Handlers
+        respect_handler_level=True
+    )
 
     # Start the queue listener
     listener.start()
@@ -60,14 +78,15 @@ def setup_logging(log_file_path: str, log_level: str = 'INFO'):
 
 def add_separator_to_log(log_file_path: str, separator: str = '-' * 80):
     """
-    Add a separator to the end of the log file.
+    Add a separator line to the log file.
 
-    Args:
-        log_file_path (str): The path to the log file.
-        separator (str): The separator string to add.
+    Writes a separator line to the end of the specified log file. Useful for
+    delineating log entries.
 
-    Returns:
-        None
+    :param log_file_path: Path to the log file.
+    :type log_file_path: str
+    :param separator: Separator string to add to the log file.
+    :type separator: str
     """
     with open(log_file_path, 'a', encoding="utf-8") as log_file:
         log_file.write(separator + '\n')

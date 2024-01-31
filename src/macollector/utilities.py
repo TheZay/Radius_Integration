@@ -1,19 +1,42 @@
 #!/usr/bin/env python
-"""Utility functions for the application."""
-from datetime import datetime
+"""
+utilities.py: Utility functions for the application.
+
+This module contains utility functions and decorators used across the
+application, including logging decorators, runtime monitoring, and
+safe script exit functionalities.
+
+It leverages the standard logging and functools modules, providing
+enhanced logging and performance measurement capabilities.
+"""
+
 import functools
-import time
 import logging
 import sys
+import time
+from datetime import datetime
 from typing import Any, Callable, Optional
+
+# Local imports
 from .logging_setup import add_separator_to_log
 
-# Global logger variable
+# Shared logger
 logger = logging.getLogger('macollector')
 
 
 def debug_log(func: Callable[..., Any]) -> Callable[..., Any]:
-    """Decorator that logs the function call and return value."""
+    """
+    Decorator to log the function call and its return value.
+
+    This decorator logs the entry and exit of the function with detailed
+    information about the arguments and the return value.
+
+    :param func: Function to be decorated.
+    :type func: Callable[..., Any]
+    :return: Wrapped function.
+    :rtype: Callable[..., Any]
+    """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         arguments = [repr(a) for a in args]
@@ -23,11 +46,23 @@ def debug_log(func: Callable[..., Any]) -> Callable[..., Any]:
         result = func(*args, **kwargs)
         logger.debug('%s() returned %r', func.__name__, result)
         return result
+
     return wrapper
 
 
 def runtime_monitor(func: Callable[..., Any]) -> Callable[..., Any]:
-    """Decorator that measures the runtime of a function."""
+    """
+    Decorator to measure and log the runtime of a function.
+
+    This decorator calculates and logs the execution time of the function,
+    aiding in performance monitoring.
+
+    :param func: Function to be decorated.
+    :type func: Callable[..., Any]
+    :return: Wrapped function.
+    :rtype: Callable[..., Any]
+    """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         start_time = time.perf_counter()
@@ -36,27 +71,30 @@ def runtime_monitor(func: Callable[..., Any]) -> Callable[..., Any]:
         logger.debug('%s() executed in %0.2f seconds.',
                      func.__name__, elapsed_time)
         return result
+
     return wrapper
 
 
 def safe_exit(
         device_counter: int = 0,
-        listener = None,
+        listener=None,
         log_file_path: str = '.\\logs\\config.json',
         script_start_timer: Optional[float] = None,
 ) -> None:
     """
-    Safely exits the script and logs the finishing time and script
-        execution completion.
+    Safely exits the script with proper logging and cleanup.
 
-    Args:
-        log_file_path (str):
-        script_start_timer (Optional[float]): The start time of the
-                                                script in seconds.
-        device_counter (int): The number of devices processed.
+    Logs the total script execution time and number of devices processed.
+    Stops the logging listener if present and adds a separator to the log file.
+    Finally, exits the script.
 
-    Returns:
-        None
+    :param device_counter: Number of devices processed.
+    :type device_counter: int
+    :param listener: Logging listener to be stopped.
+    :param log_file_path: Path to the log file for adding a separator.
+    :type log_file_path: str
+    :param script_start_timer: Start time of the script, for calculating total runtime.
+    :type script_start_timer: Optional[float]
     """
     if script_start_timer and device_counter != 0:
         # Get and log finishing time

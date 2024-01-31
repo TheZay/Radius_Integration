@@ -1,9 +1,24 @@
 #!/usr/bin/env python
-"""Manages multiple NetworkDevice instances."""
+"""
+device_manager.py: Manages multiple network devices for concurrent processing.
+
+This module contains the DeviceManager class, which is responsible for
+managing a collection of network devices. It initializes NetworkDevice
+objects and manages their concurrent processing using a thread pool. The
+class also collects MAC addresses from the devices and handles errors
+that occur during processing.
+
+The DeviceManager class allows for specifying credentials, a list of
+device IP addresses, and the maximum number of threads for concurrent
+processing.
+"""
+
 import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from .utilities import debug_log, runtime_monitor
+from concurrent.futures import as_completed, ThreadPoolExecutor
+
+# Local imports
 from .network_device import NetworkDevice
+from .utilities import debug_log, runtime_monitor
 
 # Global logger variable
 logger = logging.getLogger('macollector')
@@ -11,39 +26,41 @@ logger = logging.getLogger('macollector')
 
 class DeviceManager:
     """
-    A class that manages a collection of network devices.
+    Manages and processes a collection of network devices concurrently.
 
-    Attributes:
-        devices (list[NetworkDevice]): A list of NetworkDevice objects
-                                       representing the network devices.
-        mac_addresses (set[str]): A set of MAC addresses collected from
-                                  the network devices.
-        failed_devices (list[str]): A list of IP addresses of devices
-                                    that failed during processing.
+    The DeviceManager initializes and handles multiple NetworkDevice
+    instances, collecting MAC addresses and handling errors during
+    processing. It employs a ThreadPoolExecutor for concurrent device
+    processing.
 
-    Methods:
-        __init__(self, credentials, device_list) -> None:
-            Initializes a DeviceManager object.
-        process_all_devices(self) -> None:
-            Processes all devices in the collection.
-        process_device(self, device) -> None:
-            Processes a network device to collect MAC addresses
-        extract_mac_addresses(self, mac_address_table: list[dict]) -> set[str]:
-            Extracts valid MAC addresses from a given MAC address table.
-        is_valid_mac_address(self, mac_address: str) -> bool:
-            Checks if a given string is a valid MAC address.
+    :param credentials: Authentication credentials for network devices.
+    :type credentials: dict
+    :param device_list: IP addresses of the network devices to manage.
+    :type device_list: list
+    :param max_threads: Maximum number of threads to use for concurrent
+                        processing. Defaults to 16.
+    :type max_threads: int
+    :ivar devices: The initialized network device objects.
+    :vartype devices: list[NetworkDevice]
+    :ivar max_threads: The maximum number of threads to use for
+                       processing.
+    :vartype max_threads: int
+    :ivar mac_addresses: Collected MAC addresses from all devices.
+    :vartype mac_addresses: set[str]
+    :ivar failed_devices: IP addresses of devices that failed during
+                          processing.
+    :vartype failed_devices: list[str]
     """
 
-
-    def __init__(self, credentials, device_list, max_threads: int = 10) -> None:
+    def __init__(
+            self,
+            credentials: dict,
+            device_list: list,
+            max_threads: int = 16
+    ):
         """
-        Initializes the DeviceManager object.
-
-        Args:
-            credentials (dict): A dictionary containing the credentials
-                                for accessing the network devices.
-            device_list (list): A list of IP addresses of the network
-                                devices.
+        Initializes the DeviceManager with given credentials,
+        device list, and concurrency settings.
         """
         self.devices = [NetworkDevice(ip, credentials) for ip in device_list]
         self.max_threads = max_threads
@@ -54,26 +71,39 @@ class DeviceManager:
     @runtime_monitor
     def process_all_devices(self) -> None:
         """
-        Process all devices in the collection.
+        Processes all network devices concurrently using multiple
+        threads.
 
-        This method iterates over each device in the collection,
-            connects to the device, processes the device, and then
-            disconnects from the device. If an exception occurs during
-            the processing, the IP address of the device is logged as a
-            failed device.
+        This method sets up a ThreadPoolExecutor to handle each device's
+        MAC address collection process. It updates the set of MAC
+        addresses and logs any errors encountered during processing.
 
+        :return: None
         """
+        # Create a ThreadPoolExecutor with the maximum number of threads
         with ThreadPoolExecutor(max_workers=self.max_threads) as tpe:
             # Create a future for each device's process_device method
-            future_to_device = {tpe.submit(device.process_device):
-                                device for device in self.devices}
+            # The process_device method is expected to return a list of MAC addresses
+            # The futures dictionary maps each future to its corresponding device
+            futures = {
+                tpe.submit(device.process_device):
+                    device for device in self.devices
+            }
 
-        for future in as_completed(future_to_device):
-            device = future_to_device[future]
+        # Iterate over the futures as they complete
+        for future in as_completed(futures):
+            # Get the device associated with the completed future
+            device = futures[future]
             try:
+                # Get the result of the future, which should be a list
+                # of MAC addresses
                 mac_addresses = future.result()
+                # Add the MAC addresses to the set of all MAC addresses
                 self.mac_addresses.update(mac_addresses)
             except Exception as e:
+                # If an error occurred while processing the device, log
+                # the error and add the device's IP address to the list
+                # of failed devices
                 logger.error("Error processing device %s: %s",
                              device.ip_address, str(e))
                 self.failed_devices.append(device.ip_address)

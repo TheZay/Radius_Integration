@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-import unittest
-from unittest.mock import patch
 import argparse
-from src.main import parse_args, get_credentials, main
+import unittest
+from unittest.mock import MagicMock, patch
+
+from src.macollector.macollector import get_credentials, main, parse_args
+
 
 class TestSwitchMacCollector(unittest.TestCase):
     """Test cases for the Switch MAC Collector script."""
@@ -34,10 +36,9 @@ class TestSwitchMacCollector(unittest.TestCase):
             self.assertEqual(parsed_args.log_file_path, 'test_log.log')
             self.assertEqual(parsed_args.log_level, 'DEBUG')
 
-    @patch('src.main.input', create=True)
-    @patch('src.main.msvcrt.getch', create=True)
-    @patch('src.main.LOGGER')
-    def test_get_credentials(self, mock_logger, mock_getch, mock_input):
+    @patch('src.macollector.main.input', create=True)
+    @patch('src.macollector.main.msvcrt.getch', create=True)
+    def test_get_credentials(self, mock_getch, mock_input):
         """
         Test case for the get_credentials function.
 
@@ -55,27 +56,28 @@ class TestSwitchMacCollector(unittest.TestCase):
             "password": "test_pass"
         }
         """
+        mock_logger = MagicMock()
+
         # Mocking user input for username and password
         mock_input.return_value = "test_user"
         mock_getch.side_effect = [
             b't', b'e', b's', b't', b'_', b'p', b'a', b's', b's', b'\r'
         ]
 
-        credentials = get_credentials()
+        credentials = get_credentials(mock_logger)
 
         self.assertEqual(credentials["username"], "test_user")
         self.assertEqual(credentials["password"], "test_pass")
 
-    @patch('src.main.load_config')
-    @patch('src.main.parse_args')
-    @patch('src.main.setup_logging')
-    @patch('src.main.validate_input')
-    @patch('src.main.get_credentials')
-    @patch('src.main.DeviceManager')
-    @patch('src.main.export_xml')
-    @patch('src.main.safe_exit')
-    @patch('src.main.LOGGER')
-    def test_main(self, mock_logger, mock_safe_exit, mock_export_xml,
+    @patch('src.macollector.main.load_config')
+    @patch('src.macollector.main.parse_args')
+    @patch('src.macollector.main.setup_logging')
+    @patch('src.macollector.main.validate_input')
+    @patch('src.macollector.main.get_credentials')
+    @patch('src.macollector.main.DeviceManager')
+    @patch('src.macollector.main.export_xml')
+    @patch('src.macollector.main.safe_exit')
+    def test_main(self, mock_safe_exit, mock_export_xml,
                   mock_device_manager, mock_get_credentials,
                   mock_validate_input, mock_setup_logging,
                   mock_parse_args, mock_load_config):
@@ -115,7 +117,6 @@ class TestSwitchMacCollector(unittest.TestCase):
         mock_device_manager.assert_called_once()
         mock_export_xml.assert_called_once()
         mock_safe_exit.assert_called_once()
-
 
 
 if __name__ == '__main__':

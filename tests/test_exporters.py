@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 import unittest
-from unittest.mock import patch, mock_open
-from src.exporters import export_xml, export_txt
+from unittest.mock import mock_open, patch
+
+from src.macollector.exporters import export_txt, export_xml
+
 
 class TestExportFunctions(unittest.TestCase):
     """Test cases for the export functions."""
 
-    @patch('src.exporters.input', create=True)
-    @patch('src.exporters.save_formatted_xml')
-    @patch('src.exporters.LOGGER')
+    @patch('src.macollector.exporters.input', create=True)
+    @patch('src.macollector.exporters.save_formatted_xml')
+    @patch('src.macollector.exporters.logger')
     def test_export_xml(self, mock_logger, mock_save_xml, mock_input):
         """
         Test the export_xml function.
@@ -32,7 +34,7 @@ class TestExportFunctions(unittest.TestCase):
         ])
 
     @patch('builtins.open', new_callable=mock_open)
-    @patch('src.exporters.os.path')
+    @patch('src.macollector.exporters.os.path')
     def test_export_txt(self, mock_path, mock_file):
         """
         Test the export_txt function.
@@ -71,6 +73,7 @@ class TestExportFunctions(unittest.TestCase):
         )
         expected_content = '\n'.join(test_mac_set) + '\n'
         self.assertEqual(written_content, expected_content)
+
 
 if __name__ == '__main__':
     unittest.main()

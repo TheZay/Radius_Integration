@@ -9,7 +9,9 @@ The `TestDeviceManager` class tests the following:
 """
 import unittest
 from unittest.mock import MagicMock, patch
-from src.device_manager import DeviceManager
+
+from src.macollector.device_manager import DeviceManager
+
 
 class TestDeviceManager(unittest.TestCase):
     """
@@ -41,7 +43,7 @@ class TestDeviceManager(unittest.TestCase):
         self.credentials = {'username': 'admin', 'password': 'password'}
         self.device_list = ['192.168.1.1', '192.168.1.2']
 
-    @patch('src.device_manager.NetworkDevice')
+    @patch('src.macollector.device_manager.NetworkDevice')
     def test_process_all_devices(self, mock_network_device_class):
         """
         Test the process_all_devices method of the DeviceManager class.
@@ -89,6 +91,7 @@ class TestDeviceManager(unittest.TestCase):
         self.assertEqual(len(device_manager.failed_devices), 1)
         self.assertEqual(mock_network_device_class.call_count,
                          len(self.device_list))
+
 
 if __name__ == '__main__':
     unittest.main()

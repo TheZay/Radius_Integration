@@ -1,14 +1,18 @@
 #!/usr/bin/env python
-import unittest
+import logging
 import os
 import time
-from src.logging_setup import LOGGER, setup_logging, add_separator_to_log
+import unittest
+
+from src.macollector.logging_setup import add_separator_to_log, setup_logging
+
 
 class TestLoggingSetup(unittest.TestCase):
     """Test cases for logging setup."""
 
     def setUp(self):
         """Set up test fixtures."""
+        self.logger = logging.getLogger('test_macollector')
         self.test_log_file = 'test_log.log'
         if os.path.exists(self.test_log_file):
             os.remove(self.test_log_file)
@@ -16,9 +20,9 @@ class TestLoggingSetup(unittest.TestCase):
     def tearDown(self):
         """Tear down test fixtures."""
         # Close all handlers associated with the logger
-        for handler in LOGGER.handlers[:]:
+        for handler in self.logger.handlers[:]:
             handler.close()
-            LOGGER.removeHandler(handler)
+            self.logger.removeHandler(handler)
 
         if os.path.exists(self.test_log_file):
             os.remove(self.test_log_file)
@@ -31,7 +35,7 @@ class TestLoggingSetup(unittest.TestCase):
         self.assertTrue(os.path.exists(self.test_log_file))
 
         # Creating a test log entry
-        LOGGER.info("Test log entry")
+        self.logger.info("Test log entry")
 
         # Allow some time for the log entry to be written
         time.sleep(1)
@@ -50,6 +54,7 @@ class TestLoggingSetup(unittest.TestCase):
         with open(self.test_log_file, 'r', encoding="utf-8") as file:
             content = file.read()
             self.assertTrue(content.endswith(separator + '\n'))
+
 
 if __name__ == '__main__':
     unittest.main()

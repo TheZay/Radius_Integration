@@ -8,7 +8,9 @@ information from it.
 """
 import unittest
 from unittest.mock import MagicMock
-from src.data_processor import NetworkDataProcessor
+
+from src.macollector.data_processor import NetworkDataProcessor
+
 
 class TestNetworkDataProcessor(unittest.TestCase):
     """
@@ -17,6 +19,7 @@ class TestNetworkDataProcessor(unittest.TestCase):
     This test case verifies the functionality of the
     NetworkDataProcessor class.
     """
+
     def test_extract_voip_vlans(self):
         """
         Test case to verify the extraction of VoIP VLANs from the given
@@ -147,6 +150,7 @@ class TestNetworkDataProcessor(unittest.TestCase):
 
         self.assertTrue(NetworkDataProcessor.is_valid_vlan_id(valid_vlan_id))
         self.assertFalse(NetworkDataProcessor.is_valid_vlan_id(invalid_vlan_id))
+
 
 if __name__ == '__main__':
     unittest.main()

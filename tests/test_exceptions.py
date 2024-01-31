@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import unittest
-from src.exceptions import ScriptExit, InvalidInput
+
+from src.macollector.exceptions import InvalidInput, ScriptExit
+
 
 class TestScriptExit(unittest.TestCase):
     """Test cases for the ScriptExit exception."""
@@ -22,6 +24,7 @@ class TestScriptExit(unittest.TestCase):
 
         expected_str = f'{message} (exit code: {exit_code})'
         self.assertEqual(str(exception), expected_str)
+
 
 class TestInvalidInput(unittest.TestCase):
     """Test cases for the InvalidInput exception."""

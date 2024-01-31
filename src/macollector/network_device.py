@@ -1,57 +1,44 @@
 #!/usr/bin/env python
-"""Focuses on direct interactions with the network devices."""
+"""
+network_device.py: Interactions with network devices.
+
+This module focuses on the interactions with network devices. It includes
+the NetworkDevice class, which handles connections to devices, command
+execution, and extraction of relevant network data like VLANs and MAC addresses.
+
+The module utilizes Netmiko for SSH connections and Paramiko for SSH exceptions.
+"""
+
 import logging
+
 from netmiko import (ConnectHandler, NetmikoAuthenticationException,
                      NetmikoTimeoutException)
 from paramiko.ssh_exception import SSHException
+
+# Local imports
 from .data_processor import NetworkDataProcessor
 from .utilities import debug_log, runtime_monitor
 
-# Global logger variable
+# Shared logger
 logger = logging.getLogger('macollector')
 
 
 class NetworkDevice:
     """
-    A class that represents a network device.
+    Represents and manages a single network device.
 
-    Attributes:
-        ip_address (str): The IP address of the network device.
-        credentials (dict): A dictionary containing the username and
-                            password for authentication.
-        device_type (str): The type of the network device.
-        connection (BaseConnection): The connection object for
-                                     interacting with the device.
-        hostname (str): The hostname of the network device.
-        voip_vlans (list[int]): A list of VLAN IDs for VoIP VLANs.
-        ap_vlans (list[int]): A list of VLAN IDs for AP VLANs.
+    This class encapsulates the operations for a network device, including
+    connecting, disconnecting, executing commands, and processing VLAN and
+    MAC address information.
 
-    Methods:
-        __init__(self, ip_address, credentials) -> None:
-            Initializes a NetworkDevice object.
-        connect(self) -> None: Connects to the device using the provided
-                               credentials and device type.
-        disconnect(self) -> None: Disconnects from the switch.
-        execute_command(self, command, fsm=True) -> list[dict]:
-            Executes a command on the device and returns the output.
-        extract_voip_vlans(self, vlan_data) -> None:
-            Extracts the VLAN IDs of VoIP VLANs from the given VLAN data.
-        extract_ap_vlans(self, vlan_data) -> None:
-            Extracts the VLAN IDs of AP VLANs from the given VLAN data.
-        is_valid_vlan_id(self, vlan_id) -> bool:
-            Check if the given VLAN ID is valid.
+    :param ip_address: IP address of the network device.
+    :type ip_address: str
+    :param credentials: Credentials (username, password) for device access.
+    :type credentials: dict
     """
 
-
     def __init__(self, ip_address: str, credentials: dict) -> None:
-        """
-        Initializes a NetworkDevice object.
-
-        Args:
-            ip_address (str): The IP address of the network device.
-            credentials (dict): A dictionary containing the username and
-                                password for authentication.
-        """
+        """Initializes a NetworkDevice object."""
         self.ip_address = ip_address
         self.credentials = credentials
         self.device_type = 'cisco_ios'
@@ -62,17 +49,14 @@ class NetworkDevice:
     @runtime_monitor
     def connect(self) -> None:
         """
-        Connects to the device using the provided credentials and device
-            type.
+        Establishes a connection to the network device.
 
-        Raises:
-            NetmikoTimeoutException: If a timeout occurs while
-                                        connecting to the device.
-            NetmikoAuthenticationException: If authentication fails while
-                                            connecting to the device.
-            SSHException: If failed to retrieve the hostname for the
-                            device.
+        Attempts to connect to the device using SSH with the provided
+        credentials. If successful, retrieves the device's hostname.
 
+        :raises NetmikoTimeoutException: If a timeout occurs during connection.
+        :raises NetmikoAuthenticationException: If authentication fails.
+        :raises SSHException: If hostname retrieval fails.
         """
         try:
             self.connection = ConnectHandler(
@@ -98,12 +82,7 @@ class NetworkDevice:
     @debug_log
     @runtime_monitor
     def disconnect(self) -> None:
-        """
-        Disconnects from the switch.
-
-        This method disconnects the current connection from the
-            switch.
-        """
+        """Disconnects from the network device."""
         if self.connection:
             self.connection.disconnect()
             logger.info("Disconnected from %s (%s)",
@@ -115,14 +94,15 @@ class NetworkDevice:
         """
         Executes a command on the device and returns the output.
 
-        Args:
-            command (str): The command to be executed on the device.
-            fsm (bool, optional): Whether to use TextFSM for parsing the
-                                    output. Defaults to True.
+        Sends a command to the connected device and optionally parses the
+        output using TextFSM.
 
-        Returns:
-            list[dict]: A list of dictionaries representing the output
-                        of the command.
+        :param command: Command to be executed on the device.
+        :type command: str
+        :param fsm: Whether to use TextFSM for parsing the output.
+        :type fsm: bool, optional
+        :return: List of dictionaries representing the command output.
+        :rtype: list[dict]
         """
         if not self.connection:
             logger.error("Not connected to device %s",
@@ -149,14 +129,15 @@ class NetworkDevice:
 
     @debug_log
     @runtime_monitor
-    def process_device(self):
+    def process_device(self) -> set:
         """
-        Process the device by connecting to it, extracting VLAN
-        information, collecting MAC addresses, and then disconnecting
-        from the device.
+        Processes the device to collect MAC addresses.
 
-        Returns:
-            list: A list of MAC addresses collected from the device.
+        Connects to the device, retrieves VLAN information, collects MAC
+        addresses, and then disconnects.
+
+        :return: List of collected MAC addresses.
+        :rtype: set
         """
         logger.info("Processing %s (%s)",
                     self.hostname, self.ip_address)
@@ -164,7 +145,7 @@ class NetworkDevice:
             self.connect()
             vlan_brief = self.execute_command('show vlan brief')
             vlan_ids = NetworkDataProcessor.extract_vlans(vlan_brief)
-            mac_addresses = NetworkDataProcessor.collect_mac_addresses(
+            mac_addresses: set = NetworkDataProcessor.collect_mac_addresses(
                 vlan_ids, self.execute_command)
         finally:
             self.disconnect()
