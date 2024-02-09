@@ -1,52 +1,53 @@
-#!/usr/bin/env python
-import unittest
+import pytest
 
 from src.macollector.exceptions import InvalidInput, ScriptExit
 
 
-class TestScriptExit(unittest.TestCase):
-    """Test cases for the ScriptExit exception."""
+def test_invalid_input_exception():
+    """
+    Tests the InvalidInput exception for correct message and exit code attributes.
 
-    def test_script_exit_initialization(self):
-        """Test the initialization of ScriptExit exception."""
-        message = "Test error"
-        exit_code = 1
-        exception = ScriptExit(message, exit_code)
+    This test verifies that when the InvalidInput exception is raised, it correctly encapsulates
+    the provided message and exit code within its attributes. The test checks both the string
+    representation of the exception and the exit_code attribute to ensure they match expected values.
 
-        self.assertEqual(exception.message, message)
-        self.assertEqual(exception.exit_code, exit_code)
+    Ensures that the exception accurately represents errors related to invalid user input, facilitating
+    debugging and error handling in the application.
+    """
+    message = "Invalid input provided"
+    exit_code = 2
 
-    def test_script_exit_str(self):
-        """Test the string representation of ScriptExit exception."""
-        message = "Test error"
-        exit_code = 1
-        exception = ScriptExit(message, exit_code)
+    with pytest.raises(InvalidInput) as excinfo:
+        raise InvalidInput(message, exit_code=exit_code)
 
-        expected_str = f'{message} (exit code: {exit_code})'
-        self.assertEqual(str(exception), expected_str)
-
-
-class TestInvalidInput(unittest.TestCase):
-    """Test cases for the InvalidInput exception."""
-
-    def test_invalid_input_initialization(self):
-        """Test the initialization of InvalidInput exception."""
-        message = "Invalid input error"
-        exit_code = 2
-        exception = InvalidInput(message, exit_code)
-
-        self.assertEqual(exception.message, message)
-        self.assertEqual(exception.exit_code, exit_code)
-
-    def test_invalid_input_str(self):
-        """Test the string representation of InvalidInput exception."""
-        message = "Invalid input error"
-        exit_code = 2
-        exception = InvalidInput(message, exit_code)
-
-        expected_str = f'{message} (exit code: {exit_code})'
-        self.assertEqual(str(exception), expected_str)
+    assert (
+        str(excinfo.value) == f"{message} (exit code: {exit_code})"
+    ), "InvalidInput Exception message does not match"
+    assert (
+        excinfo.value.exit_code == exit_code
+    ), "InvalidInput Exception exit code does not match"
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_script_exit_exception():
+    """
+    Tests the ScriptExit exception for accurate message and exit code attributes.
+
+    This test ensures that when the ScriptExit exception is raised, it properly includes the given
+    message and exit code within its attributes. It evaluates the string representation of the exception
+    and the exit_code attribute to confirm they align with expected values.
+
+    Validates that the exception serves its purpose in signaling the need for the script to exit due
+    to an error, with precise error reporting for logging or user notification.
+    """
+    message = "Script exited due to error"
+    exit_code = 1
+
+    with pytest.raises(ScriptExit) as excinfo:
+        raise ScriptExit(message, exit_code=exit_code)
+
+    assert (
+        str(excinfo.value) == f"{message} (exit code: {exit_code})"
+    ), "ScriptExit Exception message does not match"
+    assert (
+        excinfo.value.exit_code == exit_code
+    ), "ScriptExit Exception exit code does not match"

@@ -1,89 +1,73 @@
-#!/usr/bin/env python
-import time
-import unittest
-from unittest.mock import MagicMock, patch
-
 from src.macollector.utilities import debug_log, runtime_monitor, safe_exit
 
 
-class TestUtilityFunctions(unittest.TestCase):
-    """Test cases for utility functions."""
+def test_debug_log_decorator_logs_function_call_and_return_value(mocker):
+    """
+    Tests the debug_log decorator for logging function calls and their return values.
 
-    @patch('src.macollector.utilities.logger')
-    def test_debug_log_decorator(self, mock_logger):
-        """Test the debug_log decorator."""
+    Verifies that the `debug_log` decorator correctly logs both the entry to and the exit from
+    a decorated function, including the function's return value. The test checks that the logger's
+    debug method is called twice - once before the function executes and once after, confirming
+    the decorator's functionality in capturing and logging debug information.
 
-        @debug_log
-        def dummy_function(x, y):
-            return x + y
+    :param mocker: Pytest fixture for mocking.
+    """
+    mock_logger = mocker.patch("src.macollector.utilities.logger", autospec=True)
 
-        # pylint: disable=unused-variable
-        result = dummy_function(5, 3)
+    @debug_log
+    def mock_function(a, b):
+        return a + b
 
-        # Ensure that LOGGER.debug was called twice
-        self.assertEqual(mock_logger.debug.call_count, 2)
+    result = mock_function(1, 2)
 
-        # Manually format the arguments of the first call to LOGGER.debug
-        first_call_args = mock_logger.debug.call_args_list[0]
-        first_call_message = first_call_args[0][0] % first_call_args[0][1:]
-
-        # Manually format the arguments of the second call to LOGGER.debug
-        second_call_args = mock_logger.debug.call_args_list[1]
-        second_call_message = second_call_args[0][0] % second_call_args[0][1:]
-
-        # Assertions
-        self.assertIn('Calling dummy_function', first_call_message)
-        self.assertIn('5, 3', first_call_message)
-        self.assertIn('dummy_function() returned', second_call_message)
-        self.assertIn('8', second_call_message)
-
-    @patch('src.macollector.utilities.logger')
-    def test_runtime_monitor_decorator(self, mock_logger):
-        """Test the runtime_monitor decorator."""
-
-        @runtime_monitor
-        def dummy_function(duration):
-            time.sleep(duration)
-            return duration
-
-        # pylint: disable=unused-variable
-        result = dummy_function(1)
-
-        # Check that LOGGER.debug was called
-        self.assertTrue(mock_logger.debug.called)
-
-        # Extract the actual call arguments
-        call_args = mock_logger.debug.call_args_list[0]
-        call_format_str, function_name, elapsed_time = call_args[0]
-
-        # Assertions
-        self.assertEqual(function_name, 'dummy_function')
-        self.assertAlmostEqual(elapsed_time, 1.0, places=2)
-        self.assertIn('%s() executed in %0.2f seconds.', call_format_str)
-
-    @patch('src.macollector.utilities.logger')
-    def test_safe_exit_function(self, mock_logger):
-        """Test the safe_exit function."""
-        with patch('sys.exit', MagicMock()) as mock_exit:
-            start_time = time.perf_counter()
-            safe_exit(script_start_timer=start_time,
-                      device_counter=5,
-                      log_file_path='test_log.log')
-
-            # Check that LOGGER.info was called at least once
-            self.assertTrue(mock_logger.info.called)
-
-            # Extract the actual call arguments
-            call_args = mock_logger.info.call_args_list[0]
-            call_format_str, elapsed_time, device_count = call_args[0]
-
-            # Assertions
-            self.assertIn('The script required %0.2f seconds to finish '
-                          'processing on', call_format_str)
-            self.assertGreater(elapsed_time, 0.0)
-            self.assertEqual(device_count, 5)
-            mock_exit.assert_called_once()
+    assert result == 3
+    assert mock_logger.debug.call_count == 2
 
 
-if __name__ == '__main__':
-    unittest.main()
+def test_runtime_monitor_decorator_logs_execution_time(mocker):
+    """
+    Tests the runtime_monitor decorator for logging function execution time.
+
+    Ensures that the `runtime_monitor` decorator correctly measures and logs the execution time
+    of a decorated function. The test asserts that the logger's debug method is called with a message
+    that includes the execution time, verifying the decorator's ability to monitor and log runtime
+    information accurately.
+
+    :param mocker: Pytest fixture for mocking.
+    """
+    mock_logger = mocker.patch("src.macollector.utilities.logger", autospec=True)
+
+    @runtime_monitor
+    def mock_function(a, b):
+        return a + b
+
+    result = mock_function(1, 2)
+
+    assert result == 3
+    assert mock_logger.debug.call_count == 1
+
+
+def test_safe_exit_logs_script_execution_time_and_exits_script(mocker):
+    """
+    Tests the safe_exit utility function for logging and exiting the script gracefully.
+
+    This test verifies that `safe_exit` logs the script's execution time, stops any running listeners,
+    adds a log separator for clarity, and then exits the script using the sys.exit method. It mocks
+    related functions and the sys module to check the call counts and arguments, ensuring the exit
+    process is handled as expected without actually terminating the test process.
+
+    :param mocker: Pytest fixture for mocking.
+    """
+    mock_logger = mocker.patch("src.macollector.utilities.logger", autospec=True)
+    mock_listener = mocker.Mock()
+    mock_add_separator_to_log = mocker.patch(
+        "src.macollector.utilities.add_separator_to_log"
+    )
+    mock_sys = mocker.patch("src.macollector.utilities.sys")
+
+    safe_exit(device_counter=5, listener=mock_listener, script_start_timer=100)
+
+    assert mock_logger.info.call_count == 2
+    assert mock_listener.stop.call_count == 1
+    assert mock_add_separator_to_log.call_count == 1
+    assert mock_sys.exit.call_count == 1

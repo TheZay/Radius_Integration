@@ -19,7 +19,7 @@ from typing import Callable, List, Set
 from .utilities import debug_log, runtime_monitor
 
 # Shared logger
-logger = logging.getLogger('macollector')
+logger = logging.getLogger("macollector")
 
 
 class NetworkDataProcessor:
@@ -64,7 +64,7 @@ class NetworkDataProcessor:
         voip_vlans = []
         for vlan_info in vlan_data:
             if NetworkDataProcessor.is_voip_vlan(vlan_info):
-                voip_vlans.append(int(vlan_info['vlan_id']))
+                voip_vlans.append(int(vlan_info["vlan_id"]))
         logger.debug("Discovered VoIP VLANs: %s", voip_vlans)
         return voip_vlans
 
@@ -83,7 +83,7 @@ class NetworkDataProcessor:
         ap_vlans = []
         for vlan_info in vlan_data:
             if NetworkDataProcessor.is_ap_vlan(vlan_info):
-                ap_vlans.append(int(vlan_info['vlan_id']))
+                ap_vlans.append(int(vlan_info["vlan_id"]))
         logger.debug("Discovered AP VLANs: %s", ap_vlans)
         return ap_vlans
 
@@ -91,8 +91,7 @@ class NetworkDataProcessor:
     @debug_log
     @runtime_monitor
     def collect_mac_addresses(
-            vlan_ids: List[int],
-            command_executor: Callable
+        vlan_ids: List[int], command_executor: Callable
     ) -> Set[str]:
         """
         Collects MAC addresses from specified VLANs.
@@ -106,8 +105,8 @@ class NetworkDataProcessor:
         """
         extracted_macs = set()
         for vlan_id in vlan_ids:
-            command = f'show mac address-table vlan {vlan_id}'
-            mac_address_table = command_executor(command)
+            command = "show mac address-table vlan {vlan_id}"
+            mac_address_table = command_executor(command, vlan_id=vlan_id)
             extracted_macs.update(
                 NetworkDataProcessor.extract_mac_addresses(mac_address_table)
             )
@@ -127,11 +126,11 @@ class NetworkDataProcessor:
         :rtype: Set[str]
         """
         mac_addresses = set()
-        po_pattern = re.compile(r'(?i)(Po|Port-Channel|Switch)')
+        po_pattern = re.compile(r"(?i)(Po|Port-Channel|Switch)")
 
         for mac_entry in mac_address_table:
-            mac_address = mac_entry.get('destination_address')
-            interfaces = mac_entry.get('destination_port')
+            mac_address = mac_entry.get("destination_address")
+            interfaces = mac_entry.get("destination_port")
 
             if not isinstance(interfaces, list):
                 interfaces = [str(interfaces)]
@@ -145,9 +144,7 @@ class NetworkDataProcessor:
 
     @staticmethod
     def valid_mac_addresses(
-            mac_address: str,
-            interfaces: List[str],
-            pattern: re.Pattern
+        mac_address: str, interfaces: List[str], pattern: re.Pattern
     ) -> Set[str]:
         """
         Filters valid MAC addresses based on interface and pattern.
@@ -161,9 +158,13 @@ class NetworkDataProcessor:
         :return: Set of valid MAC addresses.
         :rtype: Set[str]
         """
-        return {mac_address for interface in interfaces if interface and
-                not pattern.match(interface) and
-                NetworkDataProcessor.is_valid_mac_address(mac_address)}
+        return {
+            mac_address
+            for interface in interfaces
+            if interface
+            and not pattern.match(interface)
+            and NetworkDataProcessor.is_valid_mac_address(mac_address)
+        }
 
     @staticmethod
     def is_voip_vlan(vlan_info: dict) -> bool:
@@ -175,11 +176,12 @@ class NetworkDataProcessor:
         :return: True if it's a VoIP VLAN, False otherwise.
         :rtype: bool
         """
-        return ('vlan_name' in vlan_info and
-                re.search(r'(?i)voip|voice\s*',
-                          vlan_info['vlan_name']) and
-                vlan_info['interfaces'] and
-                NetworkDataProcessor.is_valid_vlan_id(vlan_info['vlan_id']))
+        return (
+            "vlan_name" in vlan_info
+            and re.search(r"(?i)voip|voice\s*", vlan_info["vlan_name"])
+            and vlan_info["interfaces"]
+            and NetworkDataProcessor.is_valid_vlan_id(vlan_info["vlan_id"])
+        )
 
     @staticmethod
     def is_ap_vlan(vlan_info: dict) -> bool:
@@ -191,11 +193,12 @@ class NetworkDataProcessor:
         :return: True if it's an AP VLAN, False otherwise.
         :rtype: bool
         """
-        return ('vlan_name' in vlan_info and
-                re.search(r'(?i)ap|access\s*',
-                          vlan_info['vlan_name']) and
-                vlan_info['interfaces'] and
-                NetworkDataProcessor.is_valid_vlan_id(vlan_info['vlan_id']))
+        return (
+            "vlan_name" in vlan_info
+            and re.search(r"(?i)ap|access\s*", vlan_info["vlan_name"])
+            and vlan_info["interfaces"]
+            and NetworkDataProcessor.is_valid_vlan_id(vlan_info["vlan_id"])
+        )
 
     @staticmethod
     def is_valid_mac_address(mac_address: str) -> bool:
