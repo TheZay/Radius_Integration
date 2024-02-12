@@ -1,14 +1,10 @@
 {
-    // Python configurations
     "python.analysis.typeCheckingMode": "basic",
     "python.envFile": "${workspaceFolder}/.venv",
     "python.languageServer": "Pylance",
-    "python.testing.unittestEnabled": true,
+    "python.testing.unittestEnabled": false,
 
-    // Linting configurations
     "editor.defaultFormatter": "ms-python.pylint",
-    // 72: Comments & Docstrings
-    // 79: PEP8, all other lines
     "editor.rulers": [72, 80],
     "editor.codeActionsOnSave": {
         "source.organizeImports": "explicit"
@@ -18,25 +14,22 @@
         "editor.defaultFormatter": "ms-python.autopep8"
     },
     
-    // RestructuredText configurations
     "restructuredtext.editor.tableEditor.reformat.disabled": false,
     "restructuredtext.experimental": true,
     "restructuredtext.linter.doc8.executablePath": "${workspaceFolder}/.venv/scripts/doc8.exe",
     "esbonio.server.pythonPath": "${workspaceFolder}/.venv/scripts/python.exe",
-    //"esbonio.sphinx.buildDir": "${workspaceFolder}/docs/_build/html",
-    //"esbonio.sphinx.confDir": "${workspaceFolder}/docs/_source",
-    //"esbonio.sphinx.srcDir": "${workspaceFolder}",
 
-    // Terminal configurations
     "terminal.integrated.shellIntegration.suggestEnabled": true,
 
-    // Testing configurations
-    "python.testing.pytestEnabled": false,
+    "python.testing.pytestEnabled": true,
     "python.testing.unittestArgs": [
         "-v",
         "-s",
         "./tests",
         "-p",
         "test_*.py"
+    ],
+    "python.testing.pytestArgs": [
+        "tests"
     ],
 }
