@@ -63,7 +63,7 @@ def test_collect_mac_addresses(monkeypatch):
     ]
 
     # Define a mock function for command_executor
-    def mock_command_executor(command):
+    def mock_command_executor(command, **kwargs):
         if "show mac address-table vlan" in command:
             return mock_command_output
         return []
