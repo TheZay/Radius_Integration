@@ -1,96 +1,108 @@
-#!/usr/bin/env python
-"""
-This module contains unit tests for the `config_manager` module.
+import json
+import logging
 
-The `TestLoadConfig` class tests the following:
+import pytest
 
-    - The `test_load_config_existing_file` method tests the scenario
-        where the configuration is loaded from an existing file.
-    - The `test_load_config_non_existing_file` method tests the scenario
-        where a `FileNotFoundError` is raised when trying to load a
-        non-existing config file.
-    - The `test_load_config_default_file_path` method tests the scenario
-        where the default configuration file path is used.
-"""
-import unittest
-from src.config_manager import load_config
+from src.macollector.config_manager import load_config
 
-class TestLoadConfig(unittest.TestCase):
+
+def test_load_config_file_not_found(monkeypatch):
     """
-    Test case class for testing the load_config function.
+    Test loading configuration with a non-existent file path.
 
-    This class contains test cases that verify the behavior of the
-    load_config function when given an existing file path and when given
-    a non-existing file path.
+    This test ensures that a FileNotFoundError is raised when attempting to load
+    configuration from a file that does not exist. The test uses monkeypatch to mock
+    os.path.exists to always return False, simulating the absence of the file.
+
+    :param monkeypatch: Pytest fixture to mock functions and methods.
     """
-    def test_load_config_existing_file(self):
-        """
-        Test case to verify the behavior of the load_config function
-        when loading an existing file.
+    # Mock os.path.exists to always return False
+    monkeypatch.setattr("os.path.exists", lambda path: False)
 
-        The function should load the configuration from the specified
-        file path and return the expected configuration.
+    # Verify FileNotFoundError is raised
+    with pytest.raises(FileNotFoundError):
+        load_config("nonexistent_config.json")
 
-        Steps:
-        1. Arrange the necessary test data, including the file path and
-            the expected configuration.
-        2. Call the load_config function with the file path.
-        3. Assert that the returned configuration matches the expected
-            configuration.
-        """
-        # Arrange
-        file_path = 'tests\\config_manager_test_dir\\config.json'
-        expected_config = {
-            "log_file_path": "logs\\switch_collector.log",
-            "logging_level": "DEBUG",
-            "max_threads": 3,
-            "retry_attempts": 1,
-            "retry_delay": 2
-        }
 
-        # Act
-        config = load_config(file_path)
+def test_load_config_invalid_json(tmp_path, caplog):
+    """
+    Test loading configuration from a file containing invalid JSON.
 
-        # Assert
-        self.assertEqual(config, expected_config)
+    Verifies that loading an invalid JSON configuration file logs an appropriate error
+    message and returns an empty dictionary. The test creates a temporary file with
+    invalid JSON content to simulate this scenario.
 
-    def test_load_config_non_existing_file(self):
-        """
-        Test case to verify the behavior of load_config function when
-        given a non-existing file path.
+    :param tmp_path: Pytest fixture to create and return a temporary directory.
+    :param caplog: Pytest fixture to capture log messages.
+    """
+    # Create a temporary JSON file with invalid content
+    invalid_json_file = tmp_path / "invalid.json"
+    invalid_json_file.write_text("invalid json")
 
-        It should raise a FileNotFoundError.
-        """
-        # Arrange
-        file_path = 'non_existing_config.json'
+    # Capture logging
+    with caplog.at_level(logging.ERROR):
+        # Attempt to load the invalid JSON, expecting an empty dict
+        config = load_config(str(invalid_json_file))
+        assert config == {}, "Expected an empty dictionary for invalid JSON"
+        assert (
+            "Error parsing configuration file" in caplog.text
+        ), "Expected an error log for invalid JSON"
 
-        # Act and Assert
-        with self.assertRaises(FileNotFoundError):
-            load_config(file_path)
 
-    def test_load_config_default_file_path(self):
-        """
-        Test case to verify the behavior of the load_config function
-        when using the default file path.
+def test_load_config_valid_json(monkeypatch, tmp_path, caplog):
+    """
+    Test loading configuration from a valid JSON file.
 
-        The expected behavior is that the function should return an
-        empty dictionary as the default configuration.
+    Ensures that a valid JSON configuration file is correctly parsed into a dictionary.
+    The test creates a temporary file with valid JSON content to simulate this scenario.
 
-        """
-        # Arrange
-        expected_config = {
-            "log_file_path": "logs\\switch_mac_collector.log",
-            "logging_level": "INFO",
-            "max_threads": 5,
-            "retry_attempts": 3,
-            "retry_delay": 5
-        }
+    :param monkeypatch: Pytest fixture to mock functions and methods.
+    :param tmp_path: Pytest fixture to create and return temporary directory.
+    :param caplog: Pytest fixture to capture log messages.
+    """
+    # Prepare a valid JSON content
+    valid_config = {"key": "value"}
+    valid_json_content = json.dumps(valid_config)
 
-        # Act
-        config = load_config()
+    # Create a temporary valid JSON file
+    valid_json_file = tmp_path / "valid.json"
+    valid_json_file.write_text(valid_json_content)
 
-        # Assert
-        self.assertEqual(config, expected_config)
+    # Load the configuration and verify the content
+    loaded_config = load_config(str(valid_json_file))
+    assert (
+        loaded_config == valid_config
+    ), "Expected configuration dictionary to match the JSON content"
 
-if __name__ == '__main__':
-    unittest.main()
+
+def test_load_config_unexpected_error(monkeypatch, caplog):
+    """
+    Test handling of unexpected errors during configuration loading.
+
+    Simulates an unexpected IOError during the configuration loading process to test
+    error handling and logging. The test uses monkeypatch to replace the built-in open
+    function with one that raises an IOError.
+
+    :param monkeypatch: Pytest fixture to mock functions and methods.
+    :param caplog: Pytest fixture to capture log messages.
+    """
+
+    # Define a function to be used as the side effect of open
+    def raise_io_error(*args, **kwargs):
+        raise IOError("Unexpected error")
+
+    # Use monkeypatch to replace 'open' with a function that raises an IOError
+    monkeypatch.setattr("builtins.open", raise_io_error)
+
+    # Ensure os.path.exists returns True so that we attempt to open the file
+    monkeypatch.setattr("os.path.exists", lambda path: True)
+
+    # Set the logging level to capture with caplog
+    with caplog.at_level(logging.ERROR):
+        # Call the function and expect an empty dict due to the handled error
+        config = load_config("any_path.json")
+        assert config == {}, "Expected an empty dictionary on unexpected error"
+        # Check if the appropriate error message was logged
+        assert (
+            "Error loading configuration file" in caplog.text
+        ), "Expected an error log for unexpected error"

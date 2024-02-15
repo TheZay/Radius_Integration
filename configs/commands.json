@@ -1,0 +1,12 @@
+{
+  "cisco_ios": [
+    "show version",
+    "show vlan brief",
+    "show mac address-table vlan {vlan_id}"
+  ],
+  "cisco_nxos": [
+    "show version",
+    "show vlan brief",
+    "show mac address-table vlan {vlan_id}"
+  ]
+}

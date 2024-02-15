@@ -151,6 +151,8 @@ dmypy.json
 vscode/
 .idea/
 idea/
+.vs/
+vs/
 
 # Generated files
 *.xml

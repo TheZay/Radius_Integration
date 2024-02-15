@@ -1,152 +1,181 @@
-#!/usr/bin/env python
-"""
-This module contains the test cases for the NetworkDataProcessor class.
+import pytest
 
-The NetworkDataProcessor class is responsible for processing the data
-collected from the network devices and extracting the required
-information from it.
-"""
-import unittest
-from unittest.mock import MagicMock
-from src.data_processor import NetworkDataProcessor
+from src.macollector.data_processor import NetworkDataProcessor
 
-class TestNetworkDataProcessor(unittest.TestCase):
+
+def test_extract_voip_vlans():
     """
-    Test case for the NetworkDataProcessor class.
-    
-    This test case verifies the functionality of the
-    NetworkDataProcessor class.
+    Test VOIP VLAN extraction from a list of VLAN data.
+
+    Verifies that the extract_voip_vlans function correctly identifies and extracts
+    VLAN IDs designated for VOIP services based on their names from a given list
+    of VLAN information dictionaries.
+
+    The test provides a sample list of VLAN data and checks if the function returns
+    the expected list of VOIP VLAN IDs.
     """
-    def test_extract_voip_vlans(self):
-        """
-        Test case to verify the extraction of VoIP VLANs from the given
-        VLAN data.
-        """
-        vlan_data = [
-            {'vlan_name': 'VoIP VLAN',
-             'vlan_id': '10',
-             'interfaces': ['GigabitEthernet1']},
-            {'vlan_name': 'Data VLAN',
-             'vlan_id': '20',
-             'interfaces': ['GigabitEthernet2']},
-            {'vlan_name': 'VoIP VLAN',
-             'vlan_id': '30',
-             'interfaces': ['GigabitEthernet3']},
-        ]
-        expected_voip_vlans = [10, 30]
+    vlan_data = [
+        {"vlan_id": "100", "vlan_name": "VOICE VLAN", "interfaces": ["Gi1/0/1"]},
+        {"vlan_id": "200", "vlan_name": "DATA VLAN", "interfaces": ["Gi1/0/2"]},
+    ]
+    expected_voip_vlans = [100]
+    assert (
+        NetworkDataProcessor.extract_voip_vlans(vlan_data) == expected_voip_vlans
+    ), "VOIP VLAN extraction failed"
 
-        voip_vlans = NetworkDataProcessor.extract_voip_vlans(vlan_data)
 
-        self.assertEqual(voip_vlans, expected_voip_vlans)
+def test_extract_ap_vlans():
+    """
+    Test AP VLAN extraction from a list of VLAN data.
 
-    def test_extract_ap_vlans(self):
-        """
-        Test case for the extract_ap_vlans method of
-        NetworkDataProcessor class.
-        """
-        vlan_data = [
-            {'vlan_name': 'AP VLAN',
-             'vlan_id': '10',
-             'interfaces': ['GigabitEthernet1']},
-            {'vlan_name': 'Data VLAN',
-             'vlan_id': '20',
-             'interfaces': ['GigabitEthernet2']},
-            {'vlan_name': 'AP VLAN',
-             'vlan_id': '30',
-             'interfaces': ['GigabitEthernet3']},
-        ]
-        expected_ap_vlans = [10, 30]
+    Ensures that the extract_ap_vlans function accurately identifies and extracts
+    VLAN IDs used for Access Points (AP) based on their names from a provided list
+    of VLAN information dictionaries.
 
-        ap_vlans = NetworkDataProcessor.extract_ap_vlans(vlan_data)
+    The test uses a predefined list of VLAN data and validates if the function yields
+    the expected list of AP VLAN IDs.
+    """
+    vlan_data = [
+        {"vlan_id": "300", "vlan_name": "AP VLAN", "interfaces": ["Gi1/0/3"]},
+        {"vlan_id": "400", "vlan_name": "MANAGEMENT VLAN", "interfaces": ["Gi1/0/4"]},
+    ]
+    expected_ap_vlans = [300]
+    assert (
+        NetworkDataProcessor.extract_ap_vlans(vlan_data) == expected_ap_vlans
+    ), "AP VLAN extraction failed"
 
-        self.assertEqual(ap_vlans, expected_ap_vlans)
 
-    def test_collect_mac_addresses(self):
-        """
-        Test case for the collect_mac_addresses method of
-        NetworkDataProcessor class.
-        """
-        vlan_ids = [10, 20, 30]
-        command_executor = MagicMock()
-        command_executor.return_value = [
-            {'destination_address': '00:11:22:33:44:55',
-             'destination_port': 'GigabitEthernet1'},
-            {'destination_address': 'AA:BB:CC:DD:EE:FF',
-             'destination_port': 'GigabitEthernet2'},
-            {'destination_address': '11:22:33:44:55:66',
-             'destination_port': 'GigabitEthernet3'},
-        ]
-        expected_mac_addresses = {
-            '00:11:22:33:44:55',
-            'AA:BB:CC:DD:EE:FF',
-            '11:22:33:44:55:66'
-        }
+def test_collect_mac_addresses(monkeypatch):
+    """
+    Test MAC address collection across specified VLANs.
 
-        mac_addresses = NetworkDataProcessor.collect_mac_addresses(
-            vlan_ids, command_executor)
+    Validates the collect_mac_addresses function's ability to collect MAC addresses
+    from a mock command executor across specified VLAN IDs. The test mocks the
+    command executor function to return a predefined list of MAC addresses and
+    checks if the collection matches the expected set of MAC addresses.
 
-        self.assertEqual(mac_addresses, expected_mac_addresses)
+    :param monkeypatch: Pytest fixture to mock functions and methods.
+    """
+    vlan_ids = [100, 200]
+    mock_command_output = [
+        {"destination_address": "AA:BB:CC:DD:EE:FF", "destination_port": "Gi1/0/1"},
+        {"destination_address": "11:22:33:44:55:66", "destination_port": "Gi1/0/2"},
+    ]
 
-    def test_extract_mac_addresses(self):
-        """
-        Test case to verify the extraction of MAC addresses from a given
-        mac_address_table.
-        """
-        mac_address_table = [
-            {'destination_address': '00:11:22:33:44:55',
-             'destination_port': 'GigabitEthernet1'},
-            {'destination_address': 'AA:BB:CC:DD:EE:FF',
-             'destination_port': ['GigabitEthernet2', 'GigabitEthernet3']},
-            {'destination_address': '11:22:33:44:55:66',
-             'destination_port': 'GigabitEthernet4'},
-        ]
-        expected_mac_addresses = {
-            '00:11:22:33:44:55',
-            'AA:BB:CC:DD:EE:FF',
-            '11:22:33:44:55:66'
-        }
+    # Define a mock function for command_executor
+    def mock_command_executor(command, **kwargs):
+        if "show mac address-table vlan" in command:
+            return mock_command_output
+        return []
 
-        mac_addresses = NetworkDataProcessor.extract_mac_addresses(mac_address_table)
+    # Directly use the mock_command_executor when calling collect_mac_addresses
+    extracted_macs = NetworkDataProcessor.collect_mac_addresses(
+        vlan_ids, mock_command_executor
+    )
+    expected_macs = {"AA:BB:CC:DD:EE:FF", "11:22:33:44:55:66"}
+    assert (
+        extracted_macs == expected_macs
+    ), "MAC address collection did not return the expected results"
 
-        self.assertEqual(mac_addresses, expected_mac_addresses)
 
-    def test_is_valid_mac_address(self):
-        """
-        Test case to check the validity of a MAC address.
+@pytest.mark.parametrize(
+    "mac_address_table, expected_macs",
+    [
+        (
+            [
+                {
+                    "destination_address": "AA:BB:CC:DD:EE:FF",
+                    "destination_port": "Gi1/0/1",
+                }
+            ],
+            {"AA:BB:CC:DD:EE:FF"},
+        ),
+        (
+            [{"destination_address": "GG:HH:II:JJ:KK:LL", "destination_port": "Po1"}],
+            set(),
+        ),
+    ],
+)
+def test_extract_mac_addresses(mac_address_table, expected_macs):
+    """
+    Test MAC address extraction from MAC address table entries.
 
-        It verifies if the NetworkDataProcessor.is_valid_mac_address()
-        method correctly identifies a valid MAC address and rejects an
-        invalid MAC address.
-        """
-        valid_mac_address = '00:11:22:33:44:55'
-        invalid_mac_address = '00:11:22:33:44'
+    Parameterized test that verifies the extract_mac_addresses function can correctly
+    parse a list of MAC address table entries and extract a set of unique MAC addresses.
+    Each test case provides a sample MAC address table and the expected set of extracted
+    MAC addresses.
+    """
+    extracted_macs = NetworkDataProcessor.extract_mac_addresses(mac_address_table)
+    assert (
+        extracted_macs == expected_macs
+    ), "MAC address extraction did not match expected results"
 
-        self.assertTrue(
-            NetworkDataProcessor.is_valid_mac_address(valid_mac_address))
-        self.assertFalse(
-            NetworkDataProcessor.is_valid_mac_address(invalid_mac_address))
 
-    def test_is_valid_vlan_id(self):
-        """
-        Test case to check the validity of a VLAN ID.
+@pytest.mark.parametrize(
+    "mac_address, expected_result",
+    [
+        ("AA:BB:CC:DD:EE:FF", True),
+        ("00:00:00:00:00:00", True),
+        ("GG:HH:II:JJ:KK:LL", False),  # Invalid MAC
+        ("AA:BB:CC:DD:EE:FG", False),  # Invalid characters
+    ],
+)
+def test_is_valid_mac_address(mac_address, expected_result):
+    """
+    Test MAC address validation.
 
-        This method tests the `is_valid_vlan_id` function of the
-        `NetworkDataProcessor` class. It verifies that the function
-        correctly identifies valid and invalid VLAN IDs.
+    Parameterized test that checks the is_valid_mac_address function for correctly
+    validating the format and content of various MAC addresses. Each test case
+    provides a MAC address string and the expected boolean result indicating whether
+    the MAC address is valid or not.
+    """
+    assert (
+        NetworkDataProcessor.is_valid_mac_address(mac_address) == expected_result
+    ), f"MAC address validation failed for {mac_address}"
 
-        Test Steps:
-        1. Define a valid VLAN ID as a string.
-        2. Define an invalid VLAN ID as a string.
-        3. Call the `is_valid_vlan_id` function with the valid VLAN ID
-            and assert that it returns True.
-        4. Call the `is_valid_vlan_id` function with the invalid VLAN ID
-            and assert that it returns False.
-        """
-        valid_vlan_id = '10'
-        invalid_vlan_id = 'abc'
 
-        self.assertTrue(NetworkDataProcessor.is_valid_vlan_id(valid_vlan_id))
-        self.assertFalse(NetworkDataProcessor.is_valid_vlan_id(invalid_vlan_id))
+def test_is_voip_vlan():
+    """
+    Test identification of VOIP VLANs.
 
-if __name__ == '__main__':
-    unittest.main()
+    Verifies that the is_voip_vlan function can accurately determine whether a given
+    VLAN information dictionary represents a VOIP VLAN based on its name.
+    """
+    vlan_info = {"vlan_id": "100", "vlan_name": "VOICE VLAN", "interfaces": ["Gi1/0/1"]}
+    assert (
+        NetworkDataProcessor.is_voip_vlan(vlan_info) is True
+    ), "Failed to identify VOIP VLAN"
+
+
+def test_is_ap_vlan():
+    """
+    Test identification of AP VLANs.
+
+    Confirms that the is_ap_vlan function correctly identifies VLANs designated for
+    Access Points (AP) from a given VLAN information dictionary based on its name.
+    """
+    vlan_info = {"vlan_id": "300", "vlan_name": "AP VLAN", "interfaces": ["Gi1/0/3"]}
+    assert (
+        NetworkDataProcessor.is_ap_vlan(vlan_info) is True
+    ), "Failed to identify AP VLAN"
+
+
+@pytest.mark.parametrize(
+    "vlan_id, expected_result",
+    [
+        ("100", True),
+        ("4096", False),  # Out of range
+        ("abc", False),  # Not a digit
+    ],
+)
+def test_is_valid_vlan_id(vlan_id, expected_result):
+    """
+    Test VLAN ID validation.
+
+    Parameterized test assessing the is_valid_vlan_id function's capability to validate
+    the format and value range of VLAN IDs. Each test case provides a VLAN ID string
+    and the expected boolean result indicating the validity of the VLAN ID.
+    """
+    assert (
+        NetworkDataProcessor.is_valid_vlan_id(vlan_id) == expected_result
+    ), f"VLAN ID validation failed for {vlan_id}"

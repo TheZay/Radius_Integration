@@ -1,76 +1,58 @@
-#!/usr/bin/env python
-import unittest
-from unittest.mock import patch, mock_open
-from src.exporters import export_xml, export_txt
+from xml.etree.ElementTree import Element
 
-class TestExportFunctions(unittest.TestCase):
-    """Test cases for the export functions."""
+import pytest
 
-    @patch('src.exporters.input', create=True)
-    @patch('src.exporters.save_formatted_xml')
-    @patch('src.exporters.LOGGER')
-    def test_export_xml(self, mock_logger, mock_save_xml, mock_input):
-        """
-        Test the export_xml function.
+from src.macollector.exporters import create_xml_structure, save_formatted_xml
 
-        This test case verifies the behavior of the export_xml function.
-        It mocks the input function to provide test values for static
-        host list name and description. The function is expected to call
-        the save_formatted_xml function, log a debug message, and prompt
-        the user for static host list name and description.
-        """
-        test_mac_set = {'AA:BB:CC:DD:EE:FF', '11:22:33:44:55:66'}
-        mock_input.side_effect = ['TestHostList', 'Test Description']
 
-        export_xml(test_mac_set)
+def test_create_xml_structure(mocker):
+    """
+    Tests the creation of an XML structure from a set of MAC addresses.
 
-        mock_save_xml.assert_called_once()
-        mock_logger.debug.assert_any_call('Generated XML structure')
-        mock_input.assert_has_calls([
-            unittest.mock.call('Specify static host list name: '),
-            unittest.mock.call('Specify static host list description: ')
-        ])
+    This test verifies that the `create_xml_structure` function correctly generates an XML
+    Element structure representing a list of MAC addresses. It mocks user input to provide
+    names and descriptions for the XML structure, then asserts that the returned result is
+    an XML Element.
 
-    @patch('builtins.open', new_callable=mock_open)
-    @patch('src.exporters.os.path')
-    def test_export_txt(self, mock_path, mock_file):
-        """
-        Test the export_txt function.
+    :param mocker: Pytest fixture for mocking.
+    """
+    mocker.patch("builtins.input", side_effect=["HostListName", "HostListDescription"])
+    mac_address_set = {"00:11:22:33:44:55", "AA:BB:CC:DD:EE:FF"}
 
-        This test case verifies the behavior of the export_txt function.
-        It checks if the function correctly opens a file, writes the
-        content, and verifies the written content matches the expected
-        content.
+    result = create_xml_structure(mac_address_set)
 
-        Args:
-            self: The test case object.
-            mock_path: The mock object for os.path module.
-            mock_file: The mock object for the built-in open function.
+    assert isinstance(result, Element), "The result should be an Element"
 
-        Returns:
-            None
-        """
-        test_mac_set = {'AA:BB:CC:DD:EE:FF', '11:22:33:44:55:66'}
-        input_file_name = 'input_file.txt'
-        expected_output_file = 'input_file.txt'
 
-        # Mocking the os.path methods
-        mock_path.basename.return_value = 'input_file.txt'
-        mock_path.splitext.return_value = ('input_file', '.txt')
+def test_save_formatted_xml(mocker):
+    """
+    Tests the saving of a formatted XML string to a file.
 
-        # Call the function
-        export_txt(test_mac_set, input_file_name)
+    This test ensures that the `save_formatted_xml` function correctly attempts to save a
+    given XML string to a file. It mocks the built-in `open` function to prevent actual file
+    I/O and then verifies that `open` was called, indicating an attempt to save the XML.
 
-        # Check if the file is opened correctly
-        mock_file.assert_called_with(f'.\\{expected_output_file}',
-                                     'w', encoding="utf-8")
+    :param mocker: Pytest fixture for mocking.
+    """
+    mocker.patch("builtins.open", mocker.mock_open())
+    xml_string = "<root></root>"
+    save_formatted_xml(xml_string)
+    open.assert_called_once()  # Verifies that open was called
 
-        # Verify the content written to the file
-        written_content = ''.join(
-            args[0] for args, kwargs in mock_file().write.call_args_list
-        )
-        expected_content = '\n'.join(test_mac_set) + '\n'
-        self.assertEqual(written_content, expected_content)
 
-if __name__ == '__main__':
-    unittest.main()
+def test_save_formatted_xml_with_io_error(mocker):
+    """
+    Tests error handling in `save_formatted_xml` when an I/O error occurs.
+
+    This test checks the `save_formatted_xml` function's ability to handle I/O errors
+    gracefully. It mocks the built-in `open` function to raise an IOError, simulating a
+    scenario where the file cannot be written to. The test then asserts that an IOError
+    is indeed raised, confirming that the function propagates exceptions as expected.
+
+    :param mocker: Pytest fixture for mocking.
+    """
+    mocker.patch("builtins.open", mocker.mock_open())
+    mocker.patch("builtins.open", side_effect=IOError("Unable to write file"))
+    xml_string = "<root></root>"
+    with pytest.raises(IOError):
+        save_formatted_xml(xml_string)

@@ -1,25 +1,40 @@
 #!/usr/bin/env python
-"""Functions for exporting data to various formats."""
+"""
+exporters.py: Functions for exporting data.
+
+This module includes functions to export MAC address data to XML and text file
+formats. It uses standard logging for error handling and ElementTree for XML
+manipulation.
+
+Available functions allow exporting MAC addresses to XML or text files,
+creating specific XML structures, and saving the formatted XML to a file.
+"""
+
+import logging
 import os.path
 from datetime import datetime, timezone
 from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-from .logging_setup import LOGGER
+# Shared logger
+logger = logging.getLogger('macollector')
 
 
 def export_xml(mac_address_set: set[str]) -> None:
     """
-    Exports the given set of MAC addresses to an XML file.
+    Export MAC addresses to an XML file.
 
-    Args:
-        mac_address_set (set[str]): The set of MAC addresses to export.
+    Takes a set of MAC addresses and exports them to an XML file. The XML
+    structure is created and then saved to a file with a generated name.
 
-    Returns:
-        None
+    .. note:: The XML structure is currently hardcoded for use with
+              ClearPass.
+
+    :param mac_address_set: The set of MAC addresses to export.
+    :type mac_address_set: set[str]
     """
     root = create_xml_structure(mac_address_set)
-    LOGGER.debug('Generated XML structure')
+    logger.debug('Generated XML structure')
 
     xml_string = create_formatted_xml(root)
     save_formatted_xml(xml_string)
@@ -27,21 +42,23 @@ def export_xml(mac_address_set: set[str]) -> None:
 
 def create_xml_structure(mac_address_set: set[str]) -> Element:
     """
-    Creates an XML structure for a given set of MAC addresses.
+    Create an XML structure from MAC addresses.
 
-    Args:
-        mac_address_set (set[str]): Set of MAC addresses.
+    Generates an XML structure with a specified static host list name and
+    description, populated with the provided MAC addresses.
 
-    Returns:
-        ET.Element: The root element of the XML structure.
+    :param mac_address_set: Set of MAC addresses.
+    :type mac_address_set: set[str]
+    :return: Root element of the created XML structure.
+    :rtype: Element
     """
-    LOGGER.info("Creating XML structure for %d MAC addresses.",
+    logger.info("Creating XML structure for %d MAC addresses.",
                 len(mac_address_set))
     static_host_list_name = input('Specify static host list name: ')
-    LOGGER.debug('Static host list name: %s',
+    logger.debug('Static host list name: %s',
                  static_host_list_name)
     static_host_list_desc = input('Specify static host list description: ')
-    LOGGER.debug('Static host list description: %s',
+    logger.debug('Static host list description: %s',
                  static_host_list_desc)
 
     root = Element(
@@ -71,16 +88,12 @@ def create_xml_structure(mac_address_set: set[str]) -> Element:
 
 def create_member_element(members: Element, mac_address: str) -> None:
     """
-    Create a member element in the given 'members' element.
+    Add a member element to the XML structure.
 
-    Args:
-        members (ET.Element): The parent element to which the member
-                                element will be added.
-        mac_address (str): The MAC address to be used for creating the
-                            member element.
-
-    Returns:
-        None
+    :param members: Parent element to add the member element to.
+    :type members: Element
+    :param mac_address: MAC address for the member element.
+    :type mac_address: str
     """
     SubElement(
         members,
@@ -92,13 +105,12 @@ def create_member_element(members: Element, mac_address: str) -> None:
 
 def create_formatted_xml(root: Element) -> str:
     """
-    Creates a formatted XML string from an ElementTree root element.
+    Create a formatted XML string from an ElementTree root element.
 
-    Args:
-        root (ET.Element): The root element of the ElementTree.
-
-    Returns:
-        str: The formatted XML string.
+    :param root: The root element of the ElementTree.
+    :type root: Element
+    :return: Formatted XML string.
+    :rtype: str
     """
     xml_string = tostring(root, encoding="UTF-8").decode("utf-8")
     xml_string = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
@@ -109,16 +121,13 @@ def create_formatted_xml(root: Element) -> str:
 
 def save_formatted_xml(xml_string: str) -> None:
     """
-    Save the formatted XML string to a file.
+    Save formatted XML string to a file.
 
-    Args:
-        xml_string (str): The XML string to be saved.
-
-    Returns:
-        None
+    :param xml_string: The XML string to be saved.
+    :type xml_string: str
     """
     # Debug: Print the XML string before writing to the file
-    LOGGER.debug('Saving XML to file')
+    logger.debug('Saving XML to file')
     output_file_name = f'smc_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xml'
     with open(f'data\\{output_file_name}', 'wb') as xml_file:
         xml_file.write(xml_string.encode())
@@ -126,14 +135,16 @@ def save_formatted_xml(xml_string: str) -> None:
 
 def export_txt(mac_address_set: set[str], input_file_name: str) -> None:
     """
-    Export the given set of MAC addresses to a text file.
+    Export MAC addresses to a text file.
 
-    Args:
-        mac_address_set (set[str]): Set of MAC addresses to export.
-        input_file_name (str): Name of the input file.
+    .. note::
+        This function is currently not used and has not been tested or
+        updated since the initial implementation.
 
-    Returns:
-        None
+    :param mac_address_set: Set of MAC addresses to export.
+    :type mac_address_set: set[str]
+    :param input_file_name: Name of the input file.
+    :type input_file_name: str
     """
     out_file = f'{os.path.splitext(os.path.basename(input_file_name))[0]}.txt'
     with open(f'.\\{out_file}', 'w', encoding="utf-8") as f:
