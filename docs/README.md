@@ -56,13 +56,13 @@ It's designed to simplify network management tasks, particularly in Radius Integ
 
 ## System Requirements
 
-- Python 3.6 or later ([download here](https://www.python.org/downloads/))
-- Dependencies: `netmiko`, `paramiko`, `pyyaml`, `ipaddress` (install via pip)
+- Python 3.8 or later ([download here](https://www.python.org/downloads/))
+- Dependencies: `netmiko`, `ipaddress` (install via pip)
 
 You can install the dependencies using [pip](https://pip.pypa.io/en/stable/):
 
 ```bash
-pip install netmiko paramiko pyyaml ipaddress
+pip install netmiko ipaddress
 ```
 
 ## Getting Started
@@ -73,7 +73,7 @@ pip install netmiko paramiko pyyaml ipaddress
     - For users familiar with Git, clone the repository using `git clone [repository-url]`.
     - Alternatively, download the ZIP file from the remote repository and extract it on your machine.
 
-2. **Install Python**: Ensure Python 3.6 or newer is installed on your machine.
+2. **Install Python**: Ensure Python 3.8 or newer is installed on your machine.
    Visit [Python's official site](https://www.python.org/downloads/) for installation instructions.
 
 3. **Install Dependencies**: Open a terminal or command prompt and navigate to the script's directory.
