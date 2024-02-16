@@ -2,7 +2,7 @@
     "python.analysis.typeCheckingMode": "basic",
     "python.envFile": "${workspaceFolder}/.venv",
     "python.languageServer": "Pylance",
-    "python.testing.unittestEnabled": true,
+    "python.testing.unittestEnabled": false,
 
     "editor.defaultFormatter": "ms-python.pylint",
     "editor.rulers": [72, 80],
@@ -21,12 +21,15 @@
 
     "terminal.integrated.shellIntegration.suggestEnabled": true,
 
-    "python.testing.pytestEnabled": false,
+    "python.testing.pytestEnabled": true,
     "python.testing.unittestArgs": [
         "-v",
         "-s",
         "./tests",
         "-p",
         "test_*.py"
+    ],
+    "python.testing.pytestArgs": [
+        "tests"
     ],
 }
