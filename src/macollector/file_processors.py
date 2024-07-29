@@ -19,8 +19,8 @@ import yaml
 from ipaddress import IPv4Address, IPv4Network
 
 # Local imports
-from .exceptions import InvalidInput, ScriptExit
-from .utilities import debug_log, runtime_monitor, safe_exit
+from src.macollector.exceptions import InvalidInput, ScriptExit
+from src.macollector.utilities import debug_log, runtime_monitor, safe_exit
 
 # Shared logger
 logger = logging.getLogger('macollector')

@@ -22,13 +22,13 @@ import time
 from datetime import datetime
 
 # Local imports
-from .config_manager import load_config
-from .device_manager import DeviceManager
-from .exceptions import InvalidInput, ScriptExit
-from .exporters import export_xml
-from .file_processors import validate_input
-from .logging_setup import setup_logging
-from .utilities import safe_exit
+from src.macollector.config_manager import load_config
+from src.macollector.device_manager import DeviceManager
+from src.macollector.exceptions import InvalidInput, ScriptExit
+from src.macollector.exporters import export_xml
+from src.macollector.file_processors import validate_input
+from src.macollector.logging_setup import setup_logging
+from src.macollector.utilities import safe_exit
 
 
 def parse_args(config: dict) -> argparse.Namespace:
@@ -126,7 +126,10 @@ def main() -> None:
         logger.info("IP addresses to process: %s", ip_addresses)
         credentials = get_credentials(logger)
         device_manager = DeviceManager(
-            credentials, ip_addresses, config.get('max_threads', None))
+            credentials,
+            ip_addresses,
+            config.get('max_threads', None)
+        )
         device_manager.process_all_devices()
         export_xml(device_manager.mac_addresses)
     except InvalidInput as e:

@@ -16,7 +16,7 @@ import re
 from typing import Callable, List, Set
 
 # Local imports
-from .utilities import debug_log, runtime_monitor
+from src.macollector.utilities import debug_log, runtime_monitor
 
 # Shared logger
 logger = logging.getLogger("macollector")

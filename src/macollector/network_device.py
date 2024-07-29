@@ -21,8 +21,8 @@ from netmiko import (
 from paramiko.ssh_exception import SSHException
 
 # Local imports
-from .data_processor import NetworkDataProcessor
-from .utilities import debug_log, runtime_monitor
+from src.macollector.data_processor import NetworkDataProcessor
+from src.macollector.utilities import debug_log, runtime_monitor
 
 # Shared logger
 logger = logging.getLogger("macollector")

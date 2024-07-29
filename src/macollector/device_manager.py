@@ -14,11 +14,12 @@ processing.
 """
 
 import logging
+import traceback
 from concurrent.futures import as_completed, ThreadPoolExecutor
 
 # Local imports
-from .network_device import NetworkDevice
-from .utilities import debug_log, runtime_monitor
+from src.macollector.network_device import NetworkDevice
+from src.macollector.utilities import debug_log, runtime_monitor
 
 # Global logger variable
 logger = logging.getLogger('macollector')
@@ -52,12 +53,7 @@ class DeviceManager:
     :vartype failed_devices: list[str]
     """
 
-    def __init__(
-            self,
-            credentials: dict,
-            device_list: list,
-            max_threads: int = 16
-    ):
+    def __init__(self, credentials: dict, device_list: list, max_threads: int = 16):
         """
         Initializes the DeviceManager with given credentials,
         device list, and concurrency settings.
@@ -85,10 +81,7 @@ class DeviceManager:
             # Create a future for each device's process_device method
             # The process_device method is expected to return a list of MAC addresses
             # The futures dictionary maps each future to its corresponding device
-            futures = {
-                tpe.submit(device.process_device):
-                    device for device in self.devices
-            }
+            futures = {tpe.submit(device.process_device): device for device in self.devices}
 
         # Iterate over the futures as they complete
         for future in as_completed(futures):
@@ -106,4 +99,5 @@ class DeviceManager:
                 # of failed devices
                 logger.error("Error processing device %s: %s",
                              device.ip_address, str(e))
+                traceback.print_exc()  # More detailed error traceback
                 self.failed_devices.append(device.ip_address)
